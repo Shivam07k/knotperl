@@ -14,6 +14,15 @@ class VisitorChromeTest extends TestCase
         $this->assertStringNotContainsString('|| links[0]', $js);
     }
 
+    public function test_nav_has_only_one_underline_mechanism(): void
+    {
+        $css = (string) file_get_contents(base_path('public/css/site.css'));
+
+        $this->assertStringContainsString('.nav-highlight {', $css);
+        $this->assertStringNotContainsString('.nav-item > a::after', $css);
+        $this->assertStringNotContainsString('[aria-current="page"]::after', $css);
+    }
+
     public function test_scrollbars_are_hidden_without_disabling_scrolling(): void
     {
         $css = (string) file_get_contents(base_path('public/css/site.css'));

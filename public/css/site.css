@@ -57,9 +57,8 @@ p { margin: 0 0 1rem; }
 .nav-highlight { position: absolute; bottom: .3rem; left: 0; width: 0; height: 1px; z-index: 0; background: var(--accent); box-shadow: 0 0 8px rgba(212,175,55,.45); pointer-events: none; transition: left .35s var(--ease), width .35s var(--ease); }
 .nav-item { position: relative; z-index: 1; }
 .nav-item > a { display: inline-block; position: relative; z-index: 0; padding: .65rem 1rem; transition: color .3s var(--ease); }
-.nav-item > a::after { content: ''; position: absolute; left: 0; right: 100%; bottom: .3rem; height: 1px; background: rgba(212,175,55,.5); transition: right .3s var(--ease); }
+/* The sliding .nav-highlight is the only underline; aria-current only changes colour. */
 .nav-item > a:hover, .nav-item > a[aria-current="page"] { color: var(--accent); }
-.nav-item > a:hover::after, .nav-item > a[aria-current="page"]::after { right: 0; }
 .nav-list .nav-list { position: absolute; top: 100%; left: 0; min-width: 190px; display: none; flex-direction: column; gap: 0; background: var(--bg-soft); border: 1px solid var(--line); padding: .5rem 1rem; }
 .nav-item:hover > .nav-list, .nav-item:focus-within > .nav-list { display: flex; }
 .nav-list .nav-list .nav-list { top: 0; left: 100%; }
