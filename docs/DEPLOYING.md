@@ -168,12 +168,23 @@ See the [secrets reference](#secrets-reference) below for each value.
    name it `site-cms`.
 2. Upload the content file. From a terminal in the project folder:
    ```bash
-   npx wrangler r2 object put site-cms/content.json --file=storage/app/content.json
+   npx wrangler r2 object put site-cms/content.json --file=storage/app/content.json --remote
    ```
-3. Go to **R2 → Manage R2 API tokens → Create API token**, allow object read and
+3. Upload the built-in pictures too. The generated HTML points **every** image at
+   the R2 public URL, so files must exist in the bucket as well as in `public/assets/`:
+   ```bash
+   npx wrangler r2 object put site-cms/assets/logo/logo.svg --file=public/assets/logo/logo.svg --content-type=image/svg+xml --remote
+   npx wrangler r2 object put site-cms/assets/banners/winter-desktop.jpg --file=public/assets/banners/winter-desktop.jpg --content-type=image/jpeg --remote
+   ```
+   Repeat for every picture referenced in `content.json` (logo, banners, categories,
+   products, pages, services, testimonials and og). Use `image/jpeg` for `.jpg`,
+   `image/svg+xml` for `.svg`. Always pass `--remote`: without it Wrangler writes to
+   local storage instead of the real bucket. If a picture is missing after a Publish,
+   this is the first thing to check.
+4. Go to **R2 → Manage R2 API tokens → Create API token**, allow object read and
    write on `site-cms`, then copy the **Access Key ID** and **Secret Access Key**
    into the two GitHub secrets from step 1.
-4. On the bucket open **Settings → Public development URL → Enable**. Put that URL
+5. On the bucket open **Settings → Public development URL → Enable**. Put that URL
    in `CLOUDFLARE_R2_PUBLIC_URL` in GitHub and `R2_PUBLIC_URL` in
    `worker/wrangler.toml`.
 
