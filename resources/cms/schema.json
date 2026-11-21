@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "status_values": ["active", "inactive", "draft"],
+  "section_types": [
+    "Hero", "Featured Categories", "Featured Products", "New Arrivals",
+    "Product Grid", "About Us", "Services", "Testimonials", "Statistics",
+    "Image Gallery", "Promotional Banner", "Contact Information", "Newsletter",
+    "Custom HTML"
+  ],
+  "page_templates": ["home", "about", "contact", "services", "products", "category", "product", "custom"],
+  "tabs": [
+    {
+      "name": "Settings", "key": "key", "headers": ["key", "value", "type", "description", "updated_at"],
+      "unique": ["key"], "types": {}, "enums": {}
+    },
+    {
+      "name": "Pages", "key": "page_id",
+      "headers": ["page_id", "title", "slug", "page_type", "template", "content", "featured_image", "meta_title", "meta_description", "meta_keywords", "status", "sort_order", "updated_at"],
+      "unique": ["page_id", "slug"], "required": ["page_id", "title", "slug", "template"],
+      "types": {"sort_order": "int"}, "enums": {"template": "page_templates", "status": "status_values"}
+    },
+    {
+      "name": "Products", "key": "product_id",
+      "headers": ["product_id", "product_name", "slug", "category_id", "short_description", "full_description", "regular_price", "sale_price", "SKU", "primary_image", "gallery_images", "featured", "status", "sort_order", "meta_title", "meta_description", "created_at", "updated_at"],
+      "unique": ["product_id", "slug"], "required": ["product_id", "product_name", "slug", "category_id"],
+      "types": {"regular_price": "float", "sale_price": "float", "featured": "bool", "sort_order": "int"},
+      "enums": {"status": "status_values"},
+      "references": {"category_id": "Categories.category_id"}, "images": ["primary_image", "gallery_images"]
+    },
+    {
+      "name": "Categories", "key": "category_id",
+      "headers": ["category_id", "category_name", "slug", "description", "category_image", "parent_category_id", "status", "sort_order", "meta_title", "meta_description"],
+      "unique": ["category_id", "slug"], "required": ["category_id", "category_name", "slug"],
+      "types": {"sort_order": "int"}, "enums": {"status": "status_values"},
+      "references": {"parent_category_id": "Categories.category_id"}, "images": ["category_image"]
+    },
+    {
+      "name": "Banners", "key": "banner_id",
+      "headers": ["banner_id", "title", "subtitle", "description", "desktop_image", "mobile_image", "button_text", "button_url", "background_color", "status", "sort_order", "start_date", "end_date"],
+      "unique": ["banner_id"], "required": ["banner_id", "title"],
+      "types": {"sort_order": "int", "start_date": "date", "end_date": "date"},
+      "enums": {"status": "status_values"}, "images": ["desktop_image", "mobile_image"]
+    },
+    {
+      "name": "Sections", "key": "section_id",
+      "headers": ["section_id", "page_slug", "section_type", "section_title", "section_subtitle", "section_description", "section_data", "background_color", "text_color", "status", "sort_order"],
+      "unique": ["section_id"], "required": ["section_id", "page_slug", "section_type"],
+      "types": {"sort_order": "int"}, "enums": {"section_type": "section_types", "status": "status_values"},
+      "references": {"page_slug": "Pages.slug"}
+    },
+    {
+      "name": "Navigation", "key": "menu_id",
+      "headers": ["menu_id", "menu_location", "label", "url", "parent_menu_id", "open_new_tab", "status", "sort_order"],
+      "unique": ["menu_id"], "required": ["menu_id", "menu_location", "label", "url"],
+      "types": {"open_new_tab": "bool", "sort_order": "int"},
+      "enums": {"menu_location": ["header", "footer"], "status": "status_values"},
+      "references": {"parent_menu_id": "Navigation.menu_id"}
+    },
+    {
+      "name": "Testimonials", "key": "testimonial_id",
+      "headers": ["testimonial_id", "customer_name", "customer_designation", "customer_image", "testimonial_text", "rating", "status", "sort_order"],
+      "unique": ["testimonial_id"], "required": ["testimonial_id", "customer_name", "testimonial_text"],
+      "types": {"rating": "int", "sort_order": "int"}, "enums": {"status": "status_values"},
+      "images": ["customer_image"]
+    },
+    {
+      "name": "Services", "key": "service_id",
+      "headers": ["service_id", "title", "slug", "description", "icon", "image", "status", "sort_order"],
+      "unique": ["service_id", "slug"], "required": ["service_id", "title", "slug"],
+      "types": {"sort_order": "int"}, "enums": {"status": "status_values"}, "images": ["image"]
+    },
+    {
+      "name": "SEO", "key": "page_slug",
+      "headers": ["page_slug", "meta_title", "meta_description", "meta_keywords", "canonical_url", "og_title", "og_description", "og_image", "robots_index", "robots_follow"],
+      "unique": ["page_slug"], "required": ["page_slug"],
+      "types": {"robots_index": "bool", "robots_follow": "bool"}, "images": ["og_image"]
+    },
+    {
+      "name": "Contact", "key": "contact_id",
+      "headers": ["contact_id", "label", "value", "type", "icon", "status", "sort_order"],
+      "unique": ["contact_id"], "required": ["contact_id", "label", "value"],
+      "types": {"sort_order": "int"},
+      "enums": {"type": ["email", "phone", "whatsapp", "address", "map", "social"], "status": "status_values"}
+    },
+    {
+      "name": "Redirects", "key": "redirect_id",
+      "headers": ["redirect_id", "source_url", "destination_url", "redirect_type", "status"],
+      "unique": ["redirect_id"], "required": ["redirect_id", "source_url", "destination_url"],
+      "enums": {"redirect_type": ["301", "302"], "status": "status_values"}
+    }
+  ],
+  "defaults": {
+    "site_name": "Knots & Perl",
+    "site_tagline": "Objects of quiet luxury",
+    "theme": "obsidian",
+    "default_language": "en",
+    "currency": "USD",
+    "enable_intro": true,
+    "enable_intro_sound": false,
+    "countdown_seconds": 3,
+    "enable_heavy_animation": true,
+    "primary_color": "#111111",
+    "secondary_color": "#f7f7f7",
+    "accent_color": "#d4af37",
+    "default_font": "Playfair Display",
+    "form_endpoint": "",
+    "newsletter_endpoint": ""
+  }
+}

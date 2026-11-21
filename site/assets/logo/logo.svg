@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Knots &amp; Perl">
+  <defs>
+    <radialGradient id="pearl" cx="35%" cy="28%" r="70%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".48" stop-color="#ece4d6"/>
+      <stop offset="1" stop-color="#9a8f7e"/>
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="none" stroke="#d4af37" stroke-width="1.5" opacity=".55"/>
+  <path d="M32 7 55 32 32 57 9 32Z" fill="none" stroke="#d4af37" stroke-width="2" opacity=".9"/>
+  <circle cx="32" cy="32" r="11.5" fill="url(#pearl)"/>
+  <path d="M20 32c4.5-7.5 19.5-7.5 24 0-4.5 7.5-19.5 7.5-24 0Z" fill="none" stroke="#d4af37" stroke-width="1.4" opacity=".85"/>
+  <path d="M23 24.5 41 39.5" stroke="#d4af37" stroke-width="1" opacity=".6"/>
+</svg>

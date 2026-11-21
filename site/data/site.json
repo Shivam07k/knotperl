@@ -1,0 +1,204 @@
+{
+    "settings": {
+        "site_name": "Knots & Perl",
+        "site_logo": "/assets/logo/logo.svg",
+        "favicon": "/assets/logo/logo.svg",
+        "site_tagline": "Objects of quiet luxury",
+        "primary_color": "#111111",
+        "secondary_color": "#f7f7f7",
+        "accent_color": "#d4af37",
+        "default_font": "Playfair Display",
+        "contact_email": "hello@knotsandperl.com",
+        "contact_phone": "+1 555 010 0188",
+        "whatsapp_number": "15550100188",
+        "business_address": "12 Atelier Lane, New York",
+        "copyright_text": "© 2026 Knots & Perl",
+        "default_language": "en",
+        "currency": "USD",
+        "timezone": "America/New_York",
+        "theme": "obsidian",
+        "enable_intro": true,
+        "countdown_seconds": 3,
+        "enable_heavy_animation": true,
+        "intro_video_url": "",
+        "intro_texture_url": "",
+        "maintenance_mode": false
+    },
+    "navigation": {
+        "header": [
+            {
+                "__row": 2,
+                "menu_id": "n001",
+                "menu_location": "header",
+                "label": "Home",
+                "url": "/",
+                "parent_menu_id": "",
+                "open_new_tab": false,
+                "status": "active",
+                "sort_order": 1,
+                "children": []
+            },
+            {
+                "__row": 3,
+                "menu_id": "n002",
+                "menu_location": "header",
+                "label": "Collections",
+                "url": "/products",
+                "parent_menu_id": "",
+                "open_new_tab": false,
+                "status": "active",
+                "sort_order": 2,
+                "children": [
+                    {
+                        "__row": 4,
+                        "menu_id": "n003",
+                        "menu_location": "header",
+                        "label": "Pearls",
+                        "url": "/category/pearls",
+                        "parent_menu_id": "n002",
+                        "open_new_tab": false,
+                        "status": "active",
+                        "sort_order": 1,
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "__row": 5,
+                "menu_id": "n004",
+                "menu_location": "header",
+                "label": "About",
+                "url": "/about-us",
+                "parent_menu_id": "",
+                "open_new_tab": false,
+                "status": "active",
+                "sort_order": 3,
+                "children": []
+            },
+            {
+                "__row": 6,
+                "menu_id": "n005",
+                "menu_location": "header",
+                "label": "Contact",
+                "url": "/contact-us",
+                "parent_menu_id": "",
+                "open_new_tab": false,
+                "status": "active",
+                "sort_order": 4,
+                "children": []
+            }
+        ],
+        "footer": [
+            {
+                "__row": 7,
+                "menu_id": "n006",
+                "menu_location": "footer",
+                "label": "Privacy",
+                "url": "/privacy-policy",
+                "parent_menu_id": "",
+                "open_new_tab": false,
+                "status": "active",
+                "sort_order": 1,
+                "children": []
+            }
+        ]
+    },
+    "categories": [
+        {
+            "__row": 2,
+            "category_id": "c001",
+            "category_name": "Pearls",
+            "slug": "pearls",
+            "description": "Soft forms, quiet shine.",
+            "category_image": "assets/categories/c001/main.jpg",
+            "parent_category_id": "",
+            "status": "active",
+            "sort_order": 1,
+            "meta_title": "Pearls",
+            "meta_description": "The pearl collection.",
+            "children": [
+                {
+                    "__row": 4,
+                    "category_id": "c003",
+                    "category_name": "Knots",
+                    "slug": "knots",
+                    "description": "Thread worked into form.",
+                    "category_image": "assets/categories/c003/main.jpg",
+                    "parent_category_id": "c001",
+                    "status": "active",
+                    "sort_order": 3,
+                    "meta_title": "Knots",
+                    "meta_description": "The knot collection.",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "__row": 3,
+            "category_id": "c002",
+            "category_name": "Gemstones",
+            "slug": "gemstones",
+            "description": "Stone, light and shadow.",
+            "category_image": "assets/categories/c002/main.jpg",
+            "parent_category_id": "",
+            "status": "active",
+            "sort_order": 2,
+            "meta_title": "Gemstones",
+            "meta_description": "The gemstone collection.",
+            "children": []
+        }
+    ],
+    "contact": [
+        {
+            "__row": 2,
+            "contact_id": "ct001",
+            "label": "Email",
+            "value": "hello@knotsandperl.com",
+            "type": "email",
+            "icon": "mail",
+            "status": "active",
+            "sort_order": 1
+        },
+        {
+            "__row": 3,
+            "contact_id": "ct002",
+            "label": "Telephone",
+            "value": "+1 555 010 0188",
+            "type": "phone",
+            "icon": "phone",
+            "status": "active",
+            "sort_order": 2
+        },
+        {
+            "__row": 4,
+            "contact_id": "ct003",
+            "label": "WhatsApp",
+            "value": "15550100188",
+            "type": "whatsapp",
+            "icon": "chat",
+            "status": "active",
+            "sort_order": 3
+        },
+        {
+            "__row": 5,
+            "contact_id": "ct004",
+            "label": "Atelier",
+            "value": "12 Atelier Lane, New York",
+            "type": "address",
+            "icon": "pin",
+            "status": "active",
+            "sort_order": 4
+        },
+        {
+            "__row": 6,
+            "contact_id": "ct005",
+            "label": "Instagram",
+            "value": "https://instagram.com/knotsandperl",
+            "type": "social",
+            "icon": "camera",
+            "status": "active",
+            "sort_order": 5
+        }
+    ],
+    "generated_at": "2026-11-19T16:15:22+00:00"
+}

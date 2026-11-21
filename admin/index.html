@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Website admin</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <section id="login" class="card" hidden>
+    <h1>Website admin</h1>
+    <label for="password">Password</label>
+    <input id="password" type="password" autocomplete="current-password">
+    <button id="sign-in">Sign in</button>
+    <p id="login-error" class="error"></p>
+  </section>
+
+  <div id="app" hidden>
+    <header>
+      <h1>Website</h1>
+      <div class="header-actions">
+        <span id="status" class="status">Loading…</span>
+        <button id="publish" class="primary">Publish</button>
+      </div>
+    </header>
+
+    <nav id="screens"></nav>
+    <main id="editor"></main>
+    <footer><a id="backup" href="#">Download backup</a></footer>
+  </div>
+
+  <template id="image-field">
+    <div class="picture">
+      <img alt="" hidden>
+      <label class="file-button">
+        Change picture
+        <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+      </label>
+    </div>
+  </template>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

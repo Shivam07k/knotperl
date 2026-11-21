@@ -1,0 +1,726 @@
+{
+    "Settings": [
+        {
+            "__row": 2,
+            "key": "site_name",
+            "value": "Knots & Perl",
+            "type": "text",
+            "description": "Brand name",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 3,
+            "key": "site_logo",
+            "value": "assets/logo/logo.svg",
+            "type": "image",
+            "description": "Header logo R2 key",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 4,
+            "key": "favicon",
+            "value": "assets/logo/logo.svg",
+            "type": "image",
+            "description": "Favicon R2 key",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 5,
+            "key": "site_tagline",
+            "value": "Objects of quiet luxury",
+            "type": "text",
+            "description": "Hero tagline",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 6,
+            "key": "primary_color",
+            "value": "#111111",
+            "type": "color",
+            "description": "Obsidian background",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 7,
+            "key": "secondary_color",
+            "value": "#f7f7f7",
+            "type": "color",
+            "description": "Pearl text",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 8,
+            "key": "accent_color",
+            "value": "#d4af37",
+            "type": "color",
+            "description": "Gold accent",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 9,
+            "key": "default_font",
+            "value": "Playfair Display",
+            "type": "font",
+            "description": "Heading font",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 10,
+            "key": "contact_email",
+            "value": "hello@knotsandperl.com",
+            "type": "text",
+            "description": "Public contact",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 11,
+            "key": "contact_phone",
+            "value": "+1 555 010 0188",
+            "type": "text",
+            "description": "Public phone",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 12,
+            "key": "whatsapp_number",
+            "value": "15550100188",
+            "type": "text",
+            "description": "Click-to-chat number, digits only",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 13,
+            "key": "business_address",
+            "value": "12 Atelier Lane, New York",
+            "type": "text",
+            "description": "Address",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 14,
+            "key": "copyright_text",
+            "value": "\u00a9 2026 Knots & Perl",
+            "type": "text",
+            "description": "Footer line",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 15,
+            "key": "default_language",
+            "value": "en",
+            "type": "text",
+            "description": "HTML lang",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 16,
+            "key": "currency",
+            "value": "USD",
+            "type": "text",
+            "description": "Price prefix",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 17,
+            "key": "timezone",
+            "value": "America/New_York",
+            "type": "text",
+            "description": "Display timezone",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 18,
+            "key": "maintenance_mode",
+            "value": "false",
+            "type": "bool",
+            "description": "Shows a notice when true",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 19,
+            "key": "theme",
+            "value": "obsidian",
+            "type": "text",
+            "description": "obsidian or pearl",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 20,
+            "key": "enable_intro",
+            "value": "true",
+            "type": "bool",
+            "description": "Cinematic intro",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 21,
+            "key": "enable_intro_sound",
+            "value": "false",
+            "type": "bool",
+            "description": "Opt-in WebAudio cue on brand reveal",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 22,
+            "key": "countdown_seconds",
+            "value": "3",
+            "type": "number",
+            "description": "Intro countdown length",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 23,
+            "key": "enable_heavy_animation",
+            "value": "true",
+            "type": "bool",
+            "description": "Three.js particles",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 24,
+            "key": "intro_video_url",
+            "value": "",
+            "type": "text",
+            "description": "Optional R2 video key",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 25,
+            "key": "intro_texture_url",
+            "value": "",
+            "type": "text",
+            "description": "Optional R2 texture key",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 26,
+            "key": "form_endpoint",
+            "value": "",
+            "type": "url",
+            "description": "Contact form collector (https)",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 27,
+            "key": "newsletter_endpoint",
+            "value": "",
+            "type": "url",
+            "description": "Newsletter collector (https)",
+            "updated_at": "2026-01-01"
+        }
+    ],
+    "Pages": [
+        {
+            "__row": 2,
+            "page_id": "p001",
+            "title": "Home",
+            "slug": "home",
+            "page_type": "home",
+            "template": "home",
+            "content": "Welcome to Knots & Perl.",
+            "featured_image": "assets/pages/home.jpg",
+            "meta_title": "Knots & Perl",
+            "meta_description": "Quiet luxury, considered objects.",
+            "meta_keywords": "jewellery,knots,pearls",
+            "status": "active",
+            "sort_order": "1",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 3,
+            "page_id": "p002",
+            "title": "About Us",
+            "slug": "about-us",
+            "page_type": "content",
+            "template": "about",
+            "content": "Our story is one of patience and craft.",
+            "featured_image": "assets/pages/about.jpg",
+            "meta_title": "About Knots & Perl",
+            "meta_description": "The people behind the pieces.",
+            "meta_keywords": "about,craft",
+            "status": "active",
+            "sort_order": "2",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 4,
+            "page_id": "p003",
+            "title": "Contact Us",
+            "slug": "contact-us",
+            "page_type": "contact",
+            "template": "contact",
+            "content": "We would love to hear from you.",
+            "featured_image": "",
+            "meta_title": "Contact Knots & Perl",
+            "meta_description": "Reach our atelier.",
+            "meta_keywords": "contact",
+            "status": "active",
+            "sort_order": "3",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 5,
+            "page_id": "p004",
+            "title": "Services",
+            "slug": "services",
+            "page_type": "content",
+            "template": "services",
+            "content": "Bespoke and restoration services.",
+            "featured_image": "",
+            "meta_title": "Services",
+            "meta_description": "What we offer.",
+            "meta_keywords": "services",
+            "status": "active",
+            "sort_order": "4",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 6,
+            "page_id": "p005",
+            "title": "Products",
+            "slug": "products",
+            "page_type": "catalogue",
+            "template": "products",
+            "content": "The complete collection.",
+            "featured_image": "",
+            "meta_title": "Collections",
+            "meta_description": "Browse all pieces.",
+            "meta_keywords": "products",
+            "status": "active",
+            "sort_order": "5",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 7,
+            "page_id": "p006",
+            "title": "Privacy Policy",
+            "slug": "privacy-policy",
+            "page_type": "content",
+            "template": "custom",
+            "content": "How we handle your data.",
+            "featured_image": "",
+            "meta_title": "Privacy Policy",
+            "meta_description": "Our privacy promise.",
+            "meta_keywords": "privacy",
+            "status": "active",
+            "sort_order": "6",
+            "updated_at": "2026-01-01"
+        }
+    ],
+    "Products": [
+        {
+            "__row": 2,
+            "product_id": "pr001",
+            "product_name": "Pearl Knot Pendant",
+            "slug": "pearl-knot-pendant",
+            "category_id": "c001",
+            "short_description": "A single pearl held in a hand-tied knot.",
+            "full_description": "Crafted by hand with a freshwater pearl and 18k gold wire.",
+            "regular_price": "480",
+            "sale_price": "420",
+            "SKU": "KP-001",
+            "primary_image": "assets/products/pr001/main.jpg",
+            "gallery_images": "assets/products/pr001/alt-1.jpg|assets/products/pr001/alt-2.jpg",
+            "featured": "true",
+            "status": "active",
+            "sort_order": "1",
+            "meta_title": "Pearl Knot Pendant",
+            "meta_description": "A hand-tied pearl pendant.",
+            "created_at": "2026-01-01",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 3,
+            "product_id": "pr002",
+            "product_name": "Obsidian Cuff",
+            "slug": "obsidian-cuff",
+            "category_id": "c002",
+            "short_description": "Polished stone set in matte gold.",
+            "full_description": "A sculptural cuff carved from obsidian.",
+            "regular_price": "690",
+            "sale_price": "",
+            "SKU": "KP-002",
+            "primary_image": "assets/products/pr002/main.jpg",
+            "gallery_images": "assets/products/pr002/alt-1.jpg",
+            "featured": "true",
+            "status": "active",
+            "sort_order": "2",
+            "meta_title": "Obsidian Cuff",
+            "meta_description": "A sculptural obsidian cuff.",
+            "created_at": "2026-01-01",
+            "updated_at": "2026-01-01"
+        },
+        {
+            "__row": 4,
+            "product_id": "pr003",
+            "product_name": "Silver Thread Ring",
+            "slug": "silver-thread-ring",
+            "category_id": "c001",
+            "short_description": "A delicate woven silver band.",
+            "full_description": "Sterling silver woven into a continuous thread.",
+            "regular_price": "210",
+            "sale_price": "",
+            "SKU": "KP-003",
+            "primary_image": "assets/products/pr003/main.jpg",
+            "gallery_images": "",
+            "featured": "false",
+            "status": "draft",
+            "sort_order": "3",
+            "meta_title": "Silver Thread Ring",
+            "meta_description": "Woven sterling silver.",
+            "created_at": "2026-01-01",
+            "updated_at": "2026-01-01"
+        }
+    ],
+    "Categories": [
+        {
+            "__row": 2,
+            "category_id": "c001",
+            "category_name": "Pearls",
+            "slug": "pearls",
+            "description": "Soft forms, quiet shine.",
+            "category_image": "assets/categories/c001/main.jpg",
+            "parent_category_id": "",
+            "status": "active",
+            "sort_order": "1",
+            "meta_title": "Pearls",
+            "meta_description": "The pearl collection."
+        },
+        {
+            "__row": 3,
+            "category_id": "c002",
+            "category_name": "Gemstones",
+            "slug": "gemstones",
+            "description": "Stone, light and shadow.",
+            "category_image": "assets/categories/c002/main.jpg",
+            "parent_category_id": "",
+            "status": "active",
+            "sort_order": "2",
+            "meta_title": "Gemstones",
+            "meta_description": "The gemstone collection."
+        },
+        {
+            "__row": 4,
+            "category_id": "c003",
+            "category_name": "Knots",
+            "slug": "knots",
+            "description": "Thread worked into form.",
+            "category_image": "assets/categories/c003/main.jpg",
+            "parent_category_id": "c001",
+            "status": "active",
+            "sort_order": "3",
+            "meta_title": "Knots",
+            "meta_description": "The knot collection."
+        }
+    ],
+    "Banners": [
+        {
+            "__row": 2,
+            "banner_id": "b001",
+            "title": "The Winter Edit",
+            "subtitle": "A study in contrast",
+            "description": "Pearl against obsidian.",
+            "desktop_image": "assets/banners/winter-desktop.jpg",
+            "mobile_image": "assets/banners/winter-mobile.jpg",
+            "button_text": "Discover",
+            "button_url": "/products",
+            "background_color": "#111111",
+            "status": "active",
+            "sort_order": "1",
+            "start_date": "2026-01-01",
+            "end_date": "2027-01-01"
+        }
+    ],
+    "Sections": [
+        {
+            "__row": 2,
+            "section_id": "s001",
+            "page_slug": "home",
+            "section_type": "Hero",
+            "section_title": "Knots & Perl",
+            "section_subtitle": "Objects of quiet luxury",
+            "section_description": "Hand-worked pieces in pearl, gold and stone.",
+            "section_data": "",
+            "background_color": "#111111",
+            "text_color": "#f7f7f7",
+            "status": "active",
+            "sort_order": "1"
+        },
+        {
+            "__row": 3,
+            "section_id": "s002",
+            "page_slug": "home",
+            "section_type": "Featured Categories",
+            "section_title": "Collections",
+            "section_subtitle": "Begin here",
+            "section_description": "",
+            "section_data": "c001|c002|c003",
+            "background_color": "#151515",
+            "text_color": "#f7f7f7",
+            "status": "active",
+            "sort_order": "2"
+        },
+        {
+            "__row": 4,
+            "section_id": "s003",
+            "page_slug": "home",
+            "section_type": "Featured Products",
+            "section_title": "Selected pieces",
+            "section_subtitle": "Made slowly",
+            "section_description": "",
+            "section_data": "",
+            "background_color": "#111111",
+            "text_color": "#f7f7f7",
+            "status": "active",
+            "sort_order": "3"
+        },
+        {
+            "__row": 5,
+            "section_id": "s004",
+            "page_slug": "about-us",
+            "section_type": "About Us",
+            "section_title": "Our story",
+            "section_subtitle": "Patience as practice",
+            "section_description": "",
+            "section_data": "",
+            "background_color": "#151515",
+            "text_color": "#f7f7f7",
+            "status": "active",
+            "sort_order": "1"
+        },
+        {
+            "__row": 6,
+            "section_id": "s005",
+            "page_slug": "home",
+            "section_type": "Testimonials",
+            "section_title": "Kind words",
+            "section_subtitle": "",
+            "section_description": "",
+            "section_data": "",
+            "background_color": "#111111",
+            "text_color": "#f7f7f7",
+            "status": "active",
+            "sort_order": "4"
+        },
+        {
+            "__row": 7,
+            "section_id": "s006",
+            "page_slug": "home",
+            "section_type": "Newsletter",
+            "section_title": "Stay close",
+            "section_subtitle": "",
+            "section_description": "Notes from the atelier.",
+            "section_data": "",
+            "background_color": "#151515",
+            "text_color": "#f7f7f7",
+            "status": "active",
+            "sort_order": "5"
+        }
+    ],
+    "Navigation": [
+        {
+            "__row": 2,
+            "menu_id": "n001",
+            "menu_location": "header",
+            "label": "Home",
+            "url": "/",
+            "parent_menu_id": "",
+            "open_new_tab": "false",
+            "status": "active",
+            "sort_order": "1"
+        },
+        {
+            "__row": 3,
+            "menu_id": "n002",
+            "menu_location": "header",
+            "label": "Collections",
+            "url": "/products",
+            "parent_menu_id": "",
+            "open_new_tab": "false",
+            "status": "active",
+            "sort_order": "2"
+        },
+        {
+            "__row": 4,
+            "menu_id": "n003",
+            "menu_location": "header",
+            "label": "Pearls",
+            "url": "/category/pearls",
+            "parent_menu_id": "n002",
+            "open_new_tab": "false",
+            "status": "active",
+            "sort_order": "1"
+        },
+        {
+            "__row": 5,
+            "menu_id": "n004",
+            "menu_location": "header",
+            "label": "About",
+            "url": "/about-us",
+            "parent_menu_id": "",
+            "open_new_tab": "false",
+            "status": "active",
+            "sort_order": "3"
+        },
+        {
+            "__row": 6,
+            "menu_id": "n005",
+            "menu_location": "header",
+            "label": "Contact",
+            "url": "/contact-us",
+            "parent_menu_id": "",
+            "open_new_tab": "false",
+            "status": "active",
+            "sort_order": "4"
+        },
+        {
+            "__row": 7,
+            "menu_id": "n006",
+            "menu_location": "footer",
+            "label": "Privacy",
+            "url": "/privacy-policy",
+            "parent_menu_id": "",
+            "open_new_tab": "false",
+            "status": "active",
+            "sort_order": "1"
+        }
+    ],
+    "Testimonials": [
+        {
+            "__row": 2,
+            "testimonial_id": "t001",
+            "customer_name": "Amelia R.",
+            "customer_designation": "Collector",
+            "customer_image": "assets/testimonials/amelia.jpg",
+            "testimonial_text": "The pendant arrived wrapped like a secret.",
+            "rating": "5",
+            "status": "active",
+            "sort_order": "1"
+        },
+        {
+            "__row": 3,
+            "testimonial_id": "t002",
+            "customer_name": "Noah K.",
+            "customer_designation": "Designer",
+            "customer_image": "assets/testimonials/noah.jpg",
+            "testimonial_text": "Quietly beautiful and made to last.",
+            "rating": "5",
+            "status": "active",
+            "sort_order": "2"
+        }
+    ],
+    "Services": [
+        {
+            "__row": 2,
+            "service_id": "sv001",
+            "title": "Bespoke commissions",
+            "slug": "bespoke-commissions",
+            "description": "A piece made only for you.",
+            "icon": "sparkle",
+            "image": "assets/services/bespoke.jpg",
+            "status": "active",
+            "sort_order": "1"
+        },
+        {
+            "__row": 3,
+            "service_id": "sv002",
+            "title": "Restoration",
+            "slug": "restoration",
+            "description": "Care for pieces you already love.",
+            "icon": "tool",
+            "image": "assets/services/restoration.jpg",
+            "status": "active",
+            "sort_order": "2"
+        }
+    ],
+    "SEO": [
+        {
+            "__row": 2,
+            "page_slug": "home",
+            "meta_title": "Knots & Perl | Quiet Luxury",
+            "meta_description": "Hand-worked pearl and gemstone pieces.",
+            "meta_keywords": "jewellery,pearls",
+            "canonical_url": "https://knotsandperl.com/",
+            "og_title": "Knots & Perl",
+            "og_description": "Objects of quiet luxury.",
+            "og_image": "assets/og/home.jpg",
+            "robots_index": "true",
+            "robots_follow": "true"
+        },
+        {
+            "__row": 3,
+            "page_slug": "about-us",
+            "meta_title": "About Knots & Perl",
+            "meta_description": "Our story and craft.",
+            "meta_keywords": "about,craft",
+            "canonical_url": "",
+            "og_title": "Our story",
+            "og_description": "Patience as practice.",
+            "og_image": "",
+            "robots_index": "true",
+            "robots_follow": "true"
+        }
+    ],
+    "Contact": [
+        {
+            "__row": 2,
+            "contact_id": "ct001",
+            "label": "Email",
+            "value": "hello@knotsandperl.com",
+            "type": "email",
+            "icon": "mail",
+            "status": "active",
+            "sort_order": "1"
+        },
+        {
+            "__row": 3,
+            "contact_id": "ct002",
+            "label": "Telephone",
+            "value": "+1 555 010 0188",
+            "type": "phone",
+            "icon": "phone",
+            "status": "active",
+            "sort_order": "2"
+        },
+        {
+            "__row": 4,
+            "contact_id": "ct003",
+            "label": "WhatsApp",
+            "value": "15550100188",
+            "type": "whatsapp",
+            "icon": "chat",
+            "status": "active",
+            "sort_order": "3"
+        },
+        {
+            "__row": 5,
+            "contact_id": "ct004",
+            "label": "Atelier",
+            "value": "12 Atelier Lane, New York",
+            "type": "address",
+            "icon": "pin",
+            "status": "active",
+            "sort_order": "4"
+        },
+        {
+            "__row": 6,
+            "contact_id": "ct005",
+            "label": "Instagram",
+            "value": "https://instagram.com/knotsandperl",
+            "type": "social",
+            "icon": "camera",
+            "status": "active",
+            "sort_order": "5"
+        }
+    ],
+    "Redirects": [
+        {
+            "__row": 2,
+            "redirect_id": "rd001",
+            "source_url": "/old-collection",
+            "destination_url": "/products",
+            "redirect_type": "301",
+            "status": "active"
+        }
+    ]
+}

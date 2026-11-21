@@ -1,0 +1,141 @@
+{
+  "title": "Website CMS",
+  "description": "Knots & Perl content template. Inspect with php artisan cms:template.",
+  "tabs": [
+    {
+      "name": "Settings",
+      "headers": ["key", "value", "type", "description", "updated_at"],
+      "rows": [
+        ["site_name", "Knots & Perl", "text", "Brand name", "2026-01-01"],
+        ["site_logo", "assets/logo/logo.svg", "image", "Header logo R2 key", "2026-01-01"],
+        ["favicon", "assets/logo/logo.svg", "image", "Favicon R2 key", "2026-01-01"],
+        ["site_tagline", "Objects of quiet luxury", "text", "Hero tagline", "2026-01-01"],
+        ["primary_color", "#111111", "color", "Obsidian background", "2026-01-01"],
+        ["secondary_color", "#f7f7f7", "color", "Pearl text", "2026-01-01"],
+        ["accent_color", "#d4af37", "color", "Gold accent", "2026-01-01"],
+        ["default_font", "Playfair Display", "font", "Heading font", "2026-01-01"],
+        ["contact_email", "hello@knotsandperl.com", "text", "Public contact", "2026-01-01"],
+        ["contact_phone", "+1 555 010 0188", "text", "Public phone", "2026-01-01"],
+        ["whatsapp_number", "15550100188", "text", "Click-to-chat number, digits only", "2026-01-01"],
+        ["business_address", "12 Atelier Lane, New York", "text", "Address", "2026-01-01"],
+        ["copyright_text", "© 2026 Knots & Perl", "text", "Footer line", "2026-01-01"],
+        ["default_language", "en", "text", "HTML lang", "2026-01-01"],
+        ["currency", "USD", "text", "Price prefix", "2026-01-01"],
+        ["timezone", "America/New_York", "text", "Display timezone", "2026-01-01"],
+        ["maintenance_mode", "false", "bool", "Shows a notice when true", "2026-01-01"],
+        ["theme", "obsidian", "text", "obsidian or pearl", "2026-01-01"],
+        ["enable_intro", "true", "bool", "Cinematic intro", "2026-01-01"],
+        ["enable_intro_sound", "false", "bool", "Opt-in WebAudio cue on brand reveal", "2026-01-01"],
+        ["countdown_seconds", "3", "number", "Intro countdown length", "2026-01-01"],
+        ["enable_heavy_animation", "true", "bool", "Three.js particles", "2026-01-01"],
+        ["intro_video_url", "", "text", "Optional R2 video key", "2026-01-01"],
+        ["intro_texture_url", "", "text", "Optional R2 texture key", "2026-01-01"],
+        ["form_endpoint", "", "url", "Contact form collector (https)", "2026-01-01"],
+        ["newsletter_endpoint", "", "url", "Newsletter collector (https)", "2026-01-01"]
+      ]
+    },
+    {
+      "name": "Pages",
+      "headers": ["page_id", "title", "slug", "page_type", "template", "content", "featured_image", "meta_title", "meta_description", "meta_keywords", "status", "sort_order", "updated_at"],
+      "rows": [
+        ["p001", "Home", "home", "home", "home", "Welcome to Knots & Perl.", "assets/pages/home.jpg", "Knots & Perl", "Quiet luxury, considered objects.", "jewellery,knots,pearls", "active", "1", "2026-01-01"],
+        ["p002", "About Us", "about-us", "content", "about", "Our story is one of patience and craft.", "assets/pages/about.jpg", "About Knots & Perl", "The people behind the pieces.", "about,craft", "active", "2", "2026-01-01"],
+        ["p003", "Contact Us", "contact-us", "contact", "contact", "We would love to hear from you.", "", "Contact Knots & Perl", "Reach our atelier.", "contact", "active", "3", "2026-01-01"],
+        ["p004", "Services", "services", "content", "services", "Bespoke and restoration services.", "", "Services", "What we offer.", "services", "active", "4", "2026-01-01"],
+        ["p005", "Products", "products", "catalogue", "products", "The complete collection.", "", "Collections", "Browse all pieces.", "products", "active", "5", "2026-01-01"],
+        ["p006", "Privacy Policy", "privacy-policy", "content", "custom", "How we handle your data.", "", "Privacy Policy", "Our privacy promise.", "privacy", "active", "6", "2026-01-01"]
+      ]
+    },
+    {
+      "name": "Products",
+      "headers": ["product_id", "product_name", "slug", "category_id", "short_description", "full_description", "regular_price", "sale_price", "SKU", "primary_image", "gallery_images", "featured", "status", "sort_order", "meta_title", "meta_description", "created_at", "updated_at"],
+      "rows": [
+        ["pr001", "Pearl Knot Pendant", "pearl-knot-pendant", "c001", "A single pearl held in a hand-tied knot.", "Crafted by hand with a freshwater pearl and 18k gold wire.", "480", "420", "KP-001", "assets/products/pr001/main.jpg", "assets/products/pr001/alt-1.jpg|assets/products/pr001/alt-2.jpg", "true", "active", "1", "Pearl Knot Pendant", "A hand-tied pearl pendant.", "2026-01-01", "2026-01-01"],
+        ["pr002", "Obsidian Cuff", "obsidian-cuff", "c002", "Polished stone set in matte gold.", "A sculptural cuff carved from obsidian.", "690", "", "KP-002", "assets/products/pr002/main.jpg", "assets/products/pr002/alt-1.jpg", "true", "active", "2", "Obsidian Cuff", "A sculptural obsidian cuff.", "2026-01-01", "2026-01-01"],
+        ["pr003", "Silver Thread Ring", "silver-thread-ring", "c001", "A delicate woven silver band.", "Sterling silver woven into a continuous thread.", "210", "", "KP-003", "assets/products/pr003/main.jpg", "", "false", "draft", "3", "Silver Thread Ring", "Woven sterling silver.", "2026-01-01", "2026-01-01"]
+      ]
+    },
+    {
+      "name": "Categories",
+      "headers": ["category_id", "category_name", "slug", "description", "category_image", "parent_category_id", "status", "sort_order", "meta_title", "meta_description"],
+      "rows": [
+        ["c001", "Pearls", "pearls", "Soft forms, quiet shine.", "assets/categories/c001/main.jpg", "", "active", "1", "Pearls", "The pearl collection."],
+        ["c002", "Gemstones", "gemstones", "Stone, light and shadow.", "assets/categories/c002/main.jpg", "", "active", "2", "Gemstones", "The gemstone collection."],
+        ["c003", "Knots", "knots", "Thread worked into form.", "assets/categories/c003/main.jpg", "c001", "active", "3", "Knots", "The knot collection."]
+      ]
+    },
+    {
+      "name": "Banners",
+      "headers": ["banner_id", "title", "subtitle", "description", "desktop_image", "mobile_image", "button_text", "button_url", "background_color", "status", "sort_order", "start_date", "end_date"],
+      "rows": [
+        ["b001", "The Winter Edit", "A study in contrast", "Pearl against obsidian.", "assets/banners/winter-desktop.jpg", "assets/banners/winter-mobile.jpg", "Discover", "/products", "#111111", "active", "1", "2026-01-01", "2027-01-01"]
+      ]
+    },
+    {
+      "name": "Sections",
+      "headers": ["section_id", "page_slug", "section_type", "section_title", "section_subtitle", "section_description", "section_data", "background_color", "text_color", "status", "sort_order"],
+      "rows": [
+        ["s001", "home", "Hero", "Knots & Perl", "Objects of quiet luxury", "Hand-worked pieces in pearl, gold and stone.", "", "#111111", "#f7f7f7", "active", "1"],
+        ["s002", "home", "Featured Categories", "Collections", "Begin here", "", "c001|c002|c003", "#151515", "#f7f7f7", "active", "2"],
+        ["s003", "home", "Featured Products", "Selected pieces", "Made slowly", "", "", "#111111", "#f7f7f7", "active", "3"],
+        ["s004", "about-us", "About Us", "Our story", "Patience as practice", "", "", "#151515", "#f7f7f7", "active", "1"],
+        ["s005", "home", "Testimonials", "Kind words", "", "", "", "#111111", "#f7f7f7", "active", "4"],
+        ["s006", "home", "Newsletter", "Stay close", "", "Notes from the atelier.", "", "#151515", "#f7f7f7", "active", "5"]
+      ]
+    },
+    {
+      "name": "Navigation",
+      "headers": ["menu_id", "menu_location", "label", "url", "parent_menu_id", "open_new_tab", "status", "sort_order"],
+      "rows": [
+        ["n001", "header", "Home", "/", "", "false", "active", "1"],
+        ["n002", "header", "Collections", "/products", "", "false", "active", "2"],
+        ["n003", "header", "Pearls", "/category/pearls", "n002", "false", "active", "1"],
+        ["n004", "header", "About", "/about-us", "", "false", "active", "3"],
+        ["n005", "header", "Contact", "/contact-us", "", "false", "active", "4"],
+        ["n006", "footer", "Privacy", "/privacy-policy", "", "false", "active", "1"]
+      ]
+    },
+    {
+      "name": "Testimonials",
+      "headers": ["testimonial_id", "customer_name", "customer_designation", "customer_image", "testimonial_text", "rating", "status", "sort_order"],
+      "rows": [
+        ["t001", "Amelia R.", "Collector", "assets/testimonials/amelia.jpg", "The pendant arrived wrapped like a secret.", "5", "active", "1"],
+        ["t002", "Noah K.", "Designer", "assets/testimonials/noah.jpg", "Quietly beautiful and made to last.", "5", "active", "2"]
+      ]
+    },
+    {
+      "name": "Services",
+      "headers": ["service_id", "title", "slug", "description", "icon", "image", "status", "sort_order"],
+      "rows": [
+        ["sv001", "Bespoke commissions", "bespoke-commissions", "A piece made only for you.", "sparkle", "assets/services/bespoke.jpg", "active", "1"],
+        ["sv002", "Restoration", "restoration", "Care for pieces you already love.", "tool", "assets/services/restoration.jpg", "active", "2"]
+      ]
+    },
+    {
+      "name": "SEO",
+      "headers": ["page_slug", "meta_title", "meta_description", "meta_keywords", "canonical_url", "og_title", "og_description", "og_image", "robots_index", "robots_follow"],
+      "rows": [
+        ["home", "Knots & Perl | Quiet Luxury", "Hand-worked pearl and gemstone pieces.", "jewellery,pearls", "https://knotsandperl.com/", "Knots & Perl", "Objects of quiet luxury.", "assets/og/home.jpg", "true", "true"],
+        ["about-us", "About Knots & Perl", "Our story and craft.", "about,craft", "", "Our story", "Patience as practice.", "", "true", "true"]
+      ]
+    },
+    {
+      "name": "Contact",
+      "headers": ["contact_id", "label", "value", "type", "icon", "status", "sort_order"],
+      "rows": [
+        ["ct001", "Email", "hello@knotsandperl.com", "email", "mail", "active", "1"],
+        ["ct002", "Telephone", "+1 555 010 0188", "phone", "phone", "active", "2"],
+        ["ct003", "WhatsApp", "15550100188", "whatsapp", "chat", "active", "3"],
+        ["ct004", "Atelier", "12 Atelier Lane, New York", "address", "pin", "active", "4"],
+        ["ct005", "Instagram", "https://instagram.com/knotsandperl", "social", "camera", "active", "5"]
+      ]
+    },
+    {
+      "name": "Redirects",
+      "headers": ["redirect_id", "source_url", "destination_url", "redirect_type", "status"],
+      "rows": [
+        ["rd001", "/old-collection", "/products", "301", "active"]
+      ]
+    }
+  ]
+}

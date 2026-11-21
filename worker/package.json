@@ -1,0 +1,5 @@
+{
+  "name": "site-admin-worker",
+  "private": true,
+  "type": "module"
+}

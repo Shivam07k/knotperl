@@ -1,0 +1,78 @@
+name: Publish website
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: cloudflare-pages
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: dom, gd, mbstring, zip
+          coverage: none
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Download content
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          mkdir -p storage/app
+          aws s3 cp "s3://${{ secrets.R2_BUCKET }}/content.json" storage/app/content.json \
+            --endpoint-url "https://${{ secrets.CF_ACCOUNT_ID }}.r2.cloudflarestorage.com"
+
+      - name: Generate site
+        env:
+          APP_ENV: production
+          APP_DEBUG: 'false'
+          APP_KEY: ${{ secrets.APP_KEY }}
+          CMS_CONTENT_SOURCE: json
+          CMS_CONTENT_JSON: ${{ github.workspace }}/storage/app/content.json
+          CLOUDFLARE_R2_PUBLIC_URL: ${{ secrets.CLOUDFLARE_R2_PUBLIC_URL }}
+          PUBLISH_MODE: manual
+          PUBLISH_STRICT: 'true'
+        run: php artisan cms:publish --no-deploy
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: ${{ secrets.CLOUDFLARE_PAGES_PROJECT }}
+          directory: storage/app/generated/current
+          branch: main
+
+      - name: Report success
+        env:
+          STATUS_URL: ${{ secrets.STATUS_URL }}
+          STATUS_SECRET: ${{ secrets.STATUS_SECRET }}
+        run: |
+          if [ -n "$STATUS_URL" ]; then
+            curl -fsS -X POST -H 'Content-Type: application/json' \
+              -H "x-status-secret: $STATUS_SECRET" \
+              -d '{"status":"published","message":"Website is live."}' "$STATUS_URL" || true
+          fi
+
+      - name: Report failure
+        if: failure()
+        env:
+          STATUS_URL: ${{ secrets.STATUS_URL }}
+          STATUS_SECRET: ${{ secrets.STATUS_SECRET }}
+        run: |
+          if [ -n "$STATUS_URL" ]; then
+            curl -fsS -X POST -H 'Content-Type: application/json' \
+              -H "x-status-secret: $STATUS_SECRET" \
+              -d '{"status":"failed","message":"Publishing failed. Check the build log."}' "$STATUS_URL" || true
+          fi

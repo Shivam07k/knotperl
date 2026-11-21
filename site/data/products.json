@@ -1,0 +1,81 @@
+[
+    {
+        "__row": 2,
+        "product_id": "pr001",
+        "product_name": "Pearl Knot Pendant",
+        "slug": "pearl-knot-pendant",
+        "category_id": "c001",
+        "short_description": "A single pearl held in a hand-tied knot.",
+        "full_description": "Crafted by hand with a freshwater pearl and 18k gold wire.",
+        "regular_price": 480,
+        "sale_price": 420,
+        "SKU": "KP-001",
+        "primary_image": "assets/products/pr001/main.jpg",
+        "gallery_images": "assets/products/pr001/alt-1.jpg|assets/products/pr001/alt-2.jpg",
+        "featured": true,
+        "status": "active",
+        "sort_order": 1,
+        "meta_title": "Pearl Knot Pendant",
+        "meta_description": "A hand-tied pearl pendant.",
+        "created_at": "2026-01-01",
+        "updated_at": "2026-01-01",
+        "category": {
+            "__row": 2,
+            "category_id": "c001",
+            "category_name": "Pearls",
+            "slug": "pearls",
+            "description": "Soft forms, quiet shine.",
+            "category_image": "assets/categories/c001/main.jpg",
+            "parent_category_id": "",
+            "status": "active",
+            "sort_order": 1,
+            "meta_title": "Pearls",
+            "meta_description": "The pearl collection."
+        },
+        "image_url": "/assets/products/pr001/main.jpg",
+        "gallery_urls": [
+            "/assets/products/pr001/alt-1.jpg",
+            "/assets/products/pr001/alt-2.jpg"
+        ],
+        "price": 420
+    },
+    {
+        "__row": 3,
+        "product_id": "pr002",
+        "product_name": "Obsidian Cuff",
+        "slug": "obsidian-cuff",
+        "category_id": "c002",
+        "short_description": "Polished stone set in matte gold.",
+        "full_description": "A sculptural cuff carved from obsidian.",
+        "regular_price": 690,
+        "sale_price": 0,
+        "SKU": "KP-002",
+        "primary_image": "assets/products/pr002/main.jpg",
+        "gallery_images": "assets/products/pr002/alt-1.jpg",
+        "featured": true,
+        "status": "active",
+        "sort_order": 2,
+        "meta_title": "Obsidian Cuff",
+        "meta_description": "A sculptural obsidian cuff.",
+        "created_at": "2026-01-01",
+        "updated_at": "2026-01-01",
+        "category": {
+            "__row": 3,
+            "category_id": "c002",
+            "category_name": "Gemstones",
+            "slug": "gemstones",
+            "description": "Stone, light and shadow.",
+            "category_image": "assets/categories/c002/main.jpg",
+            "parent_category_id": "",
+            "status": "active",
+            "sort_order": 2,
+            "meta_title": "Gemstones",
+            "meta_description": "The gemstone collection."
+        },
+        "image_url": "/assets/products/pr002/main.jpg",
+        "gallery_urls": [
+            "/assets/products/pr002/alt-1.jpg"
+        ],
+        "price": 690
+    }
+]

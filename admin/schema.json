@@ -1,0 +1,50 @@
+{
+  "screens": [
+    {
+      "id": "pages",
+      "label": "Pages",
+      "tab": "Pages",
+      "itemLabel": "page",
+      "idField": "page_id",
+      "idPrefix": "p",
+      "slugFrom": "title",
+      "fields": [
+        { "key": "title", "label": "Page title", "type": "text", "column": "title" },
+        { "key": "text", "label": "Text", "type": "textarea", "column": "content" },
+        { "key": "picture", "label": "Picture", "type": "image", "column": "featured_image" }
+      ]
+    },
+    {
+      "id": "products",
+      "label": "Products",
+      "tab": "Products",
+      "itemLabel": "product",
+      "idField": "product_id",
+      "idPrefix": "pr",
+      "slugFrom": "name",
+      "fields": [
+        { "key": "name", "label": "Name", "type": "text", "column": "product_name" },
+        { "key": "price", "label": "Price", "type": "text", "column": "regular_price" },
+        { "key": "description", "label": "Description", "type": "textarea", "column": "full_description" },
+        { "key": "picture", "label": "Picture", "type": "image", "column": "primary_image" }
+      ]
+    },
+    {
+      "id": "settings",
+      "label": "Settings",
+      "tab": "Settings",
+      "layout": "key-value",
+      "fields": [
+        { "key": "site_name", "label": "Brand name", "type": "text" },
+        { "key": "site_tagline", "label": "Tagline", "type": "text" },
+        { "key": "site_logo", "label": "Logo", "type": "image" },
+        { "key": "favicon", "label": "Favicon", "type": "image" },
+        { "key": "primary_color", "label": "Primary colour", "type": "color" },
+        { "key": "accent_color", "label": "Accent colour", "type": "color" },
+        { "key": "contact_email", "label": "Email", "type": "email" },
+        { "key": "contact_phone", "label": "Phone", "type": "tel" },
+        { "key": "business_address", "label": "Address", "type": "textarea" }
+      ]
+    }
+  ]
+}

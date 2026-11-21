@@ -1,0 +1,45 @@
+[
+    {
+        "__row": 2,
+        "category_id": "c001",
+        "category_name": "Pearls",
+        "slug": "pearls",
+        "description": "Soft forms, quiet shine.",
+        "category_image": "assets/categories/c001/main.jpg",
+        "parent_category_id": "",
+        "status": "active",
+        "sort_order": 1,
+        "meta_title": "Pearls",
+        "meta_description": "The pearl collection.",
+        "children": [
+            {
+                "__row": 4,
+                "category_id": "c003",
+                "category_name": "Knots",
+                "slug": "knots",
+                "description": "Thread worked into form.",
+                "category_image": "assets/categories/c003/main.jpg",
+                "parent_category_id": "c001",
+                "status": "active",
+                "sort_order": 3,
+                "meta_title": "Knots",
+                "meta_description": "The knot collection.",
+                "children": []
+            }
+        ]
+    },
+    {
+        "__row": 3,
+        "category_id": "c002",
+        "category_name": "Gemstones",
+        "slug": "gemstones",
+        "description": "Stone, light and shadow.",
+        "category_image": "assets/categories/c002/main.jpg",
+        "parent_category_id": "",
+        "status": "active",
+        "sort_order": 2,
+        "meta_title": "Gemstones",
+        "meta_description": "The gemstone collection.",
+        "children": []
+    }
+]
