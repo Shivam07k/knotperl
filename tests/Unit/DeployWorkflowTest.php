@@ -14,6 +14,7 @@ class DeployWorkflowTest extends TestCase
         $this->assertStringContainsString('CMS_CONTENT_SOURCE: json', $yml);
         $this->assertStringContainsString('cms:publish', $yml);
         $this->assertStringContainsString('r2.cloudflarestorage.com', $yml);
+        $this->assertStringContainsString('--region auto', $yml);
         $this->assertStringContainsString('cloudflare/wrangler-action@v4', $yml);
         $this->assertStringContainsString('pages deploy storage/app/generated/current', $yml);
         $this->assertStringContainsString('x-status-secret', $yml);

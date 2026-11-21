@@ -31,7 +31,8 @@ jobs:
         run: |
           mkdir -p storage/app
           aws s3 cp "s3://${{ secrets.R2_BUCKET }}/content.json" storage/app/content.json \
-            --endpoint-url "https://${{ secrets.CF_ACCOUNT_ID }}.r2.cloudflarestorage.com"
+            --endpoint-url "https://${{ secrets.CF_ACCOUNT_ID }}.r2.cloudflarestorage.com" \
+            --region auto
 
       - name: Generate site
         env:
