@@ -15,13 +15,13 @@
     },
     {
       "name": "Pages", "key": "page_id",
-      "headers": ["page_id", "title", "slug", "page_type", "template", "content", "featured_image", "meta_title", "meta_description", "meta_keywords", "status", "sort_order", "updated_at"],
+      "headers": ["page_id", "title", "slug", "page_type", "template", "content", "featured_image", "meta_title", "meta_description", "meta_keywords", "status", "sort_order", "updated_at", "hide_at"],
       "unique": ["page_id", "slug"], "required": ["page_id", "title", "slug", "template"],
       "types": {"sort_order": "int"}, "enums": {"template": "page_templates", "status": "status_values"}
     },
     {
       "name": "Products", "key": "product_id",
-      "headers": ["product_id", "product_name", "slug", "category_id", "short_description", "full_description", "regular_price", "sale_price", "SKU", "primary_image", "gallery_images", "featured", "status", "sort_order", "meta_title", "meta_description", "created_at", "updated_at"],
+      "headers": ["product_id", "product_name", "slug", "category_id", "short_description", "full_description", "regular_price", "sale_price", "SKU", "primary_image", "gallery_images", "featured", "status", "sort_order", "meta_title", "meta_description", "created_at", "updated_at", "hide_at"],
       "unique": ["product_id", "slug"], "required": ["product_id", "product_name", "slug", "category_id"],
       "types": {"regular_price": "float", "sale_price": "float", "featured": "bool", "sort_order": "int"},
       "enums": {"status": "status_values"},
@@ -29,7 +29,7 @@
     },
     {
       "name": "Categories", "key": "category_id",
-      "headers": ["category_id", "category_name", "slug", "description", "category_image", "parent_category_id", "status", "sort_order", "meta_title", "meta_description"],
+      "headers": ["category_id", "category_name", "slug", "description", "category_image", "parent_category_id", "status", "sort_order", "meta_title", "meta_description", "hide_at"],
       "unique": ["category_id", "slug"], "required": ["category_id", "category_name", "slug"],
       "types": {"sort_order": "int"}, "enums": {"status": "status_values"},
       "references": {"parent_category_id": "Categories.category_id"}, "images": ["category_image"]

@@ -9,4 +9,6 @@ return [
     'template_path' => resource_path('cms/template.json'),
     'editable_tabs' => ['Settings', 'Pages', 'Products', 'Sections', 'Navigation', 'Categories'],
     'admin_password_hash' => env('ADMIN_PASSWORD_HASH'),
+    // Media library export from the admin (alt text per picture). Set by the publish workflow.
+    'media_alt_json' => env('CMS_MEDIA_JSON'),
 ];

@@ -51,6 +51,14 @@
           "offValue": "inactive",
           "default": true,
           "group": "Visibility"
+        },
+        {
+          "key": "hide_at",
+          "label": "Hide from the website on",
+          "type": "datetime",
+          "column": "hide_at",
+          "group": "Visibility",
+          "help": "Optional. Leave empty to keep it visible. It is hidden automatically at this time."
         }
       ],
       "duplicable": false
@@ -147,6 +155,14 @@
           "offValue": "inactive",
           "default": true,
           "group": "Visibility"
+        },
+        {
+          "key": "hide_at",
+          "label": "Hide from the website on",
+          "type": "datetime",
+          "column": "hide_at",
+          "group": "Visibility",
+          "help": "Optional. Leave empty to keep it visible. It is hidden automatically at this time."
         }
       ],
       "duplicable": true
@@ -213,6 +229,14 @@
           "offValue": "inactive",
           "default": true,
           "group": "Visibility"
+        },
+        {
+          "key": "hide_at",
+          "label": "Hide from the website on",
+          "type": "datetime",
+          "column": "hide_at",
+          "group": "Visibility",
+          "help": "Optional. Leave empty to keep it visible. It is hidden automatically at this time."
         }
       ]
     },

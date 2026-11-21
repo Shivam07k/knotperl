@@ -176,6 +176,14 @@ function previewUrl(value) {
   return `${IMAGE_BASE_URL.replace(/\/$/, '')}/${String(value).replace(/^\//, '')}`;
 }
 
+/** Converts a stored UTC time into the value a datetime-local input expects, in the viewer's timezone. */
+function toLocalInput(iso) {
+  if (!iso) return '';
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+}
+
 function actionButton(text, title, disabled, onClick, danger = false) {
   const button = document.createElement('button');
   button.type = 'button';
@@ -329,6 +337,24 @@ function makeField(field, value, onChange, itemId) {
       }
     };
     wrapper.append(node);
+    return wrapper;
+  }
+
+  if (field.type === 'datetime') {
+    const input = document.createElement('input');
+    input.type = 'datetime-local';
+    input.id = id;
+    input.value = toLocalInput(value);
+    input.setAttribute('aria-describedby', `${id}-help`);
+    input.onchange = () => change(input.value ? new Date(input.value).toISOString() : '');
+    const clear = actionButton('Clear', 'Remove the hide time', !value, () => change(''));
+    clear.classList.add('ghost');
+    wrapper.append(input, clear);
+    if (field.help) {
+      const help = hint(field.help);
+      help.id = `${id}-help`;
+      wrapper.append(help);
+    }
     return wrapper;
   }
 

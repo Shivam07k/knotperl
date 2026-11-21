@@ -42,6 +42,10 @@ jobs:
           aws s3 cp "s3://${{ secrets.R2_BUCKET }}/content.json" storage/app/content.json \
             --endpoint-url "https://${{ secrets.CF_ACCOUNT_ID }}.r2.cloudflarestorage.com" \
             --region auto
+          # Alt text from the admin media library. An empty list is used if none has been saved yet.
+          aws s3 cp "s3://${{ secrets.R2_BUCKET }}/media.json" storage/app/media.json \
+            --endpoint-url "https://${{ secrets.CF_ACCOUNT_ID }}.r2.cloudflarestorage.com" \
+            --region auto || echo '[]' > storage/app/media.json
 
       - name: Generate site
         env:
@@ -50,6 +54,7 @@ jobs:
           APP_KEY: ${{ secrets.APP_KEY }}
           CMS_CONTENT_SOURCE: json
           CMS_CONTENT_JSON: ${{ github.workspace }}/storage/app/content.json
+          CMS_MEDIA_JSON: ${{ github.workspace }}/storage/app/media.json
           CLOUDFLARE_R2_PUBLIC_URL: ${{ secrets.CLOUDFLARE_R2_PUBLIC_URL }}
           PUBLISH_MODE: manual
           PUBLISH_STRICT: 'true'

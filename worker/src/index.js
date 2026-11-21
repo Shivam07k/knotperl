@@ -1,8 +1,8 @@
 import { expiredCookie, issueSession, sessionCookie, verifySession } from './auth.js';
 import {
-  addAudit, addMedia, bumpEpoch, getAudit, getContent, getEpoch, getMedia, getSchedule, getStatus, getVersion,
-  getVersionContent, listVersions, putContent, putImage, putSchedule, putStatus, putVersion, saveVersionSnapshot,
-  setMediaAlt,
+  addAudit, addMedia, bumpEpoch, getAudit, getContent, getEpoch, getHideCheck, getMedia, getSchedule, getStatus,
+  getVersion, getVersionContent, listVersions, putContent, putHideCheck, putImage, putSchedule, putStatus, putVersion,
+  saveVersionSnapshot, setMediaAlt,
 } from './store.js';
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
@@ -281,9 +281,34 @@ export async function runScheduledPublish(env, now = Date.now()) {
   return 'started';
 }
 
+/** Runs from the Worker cron. Starts a publish when an item's "hide from the website on" time has passed. */
+export async function runHideCheck(env, now = Date.now()) {
+  const previous = await getHideCheck(env);
+  await putHideCheck(env, now);
+  if (!previous) return 'initialised';
+
+  const content = await getContent(env);
+  if (!content) return 'idle';
+  const due = ['Pages', 'Products', 'Categories'].flatMap((tab) => (content[tab] ?? []).filter((row) => {
+    const at = Date.parse(row.hide_at ?? '');
+    return !Number.isNaN(at) && at > previous && at <= now;
+  }));
+  if (!due.length) return 'idle';
+
+  const failed = await dispatchWorkflow(env, null);
+  if (failed) {
+    await addAudit(env, { action: 'hiding on schedule could not start', by: 'schedule' });
+    return 'failed';
+  }
+  await addAudit(env, { action: `hid ${due.length} item${due.length === 1 ? '' : 's'} on schedule`, by: 'schedule' });
+  await putStatus(env, { status: 'publishing', message: 'Publishing…' });
+  return 'started';
+}
+
 export default {
   fetch: (request, env) => handle(request, env),
   scheduled: async (_event, env) => {
     await runScheduledPublish(env);
+    await runHideCheck(env);
   },
 };

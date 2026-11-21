@@ -3,7 +3,7 @@
     <a class="product-card-link" href="/products/{{ e($product['slug']) }}/" data-slide-panel="/products/{{ e($product['slug']) }}/">
         <div class="product-image">
             @if(!empty($product['image_url']))
-                <img src="{{ $product['image_url'] }}" alt="{{ $product['product_name'] }}" loading="lazy" width="960" height="1200">
+                <img src="{{ $product['image_url'] }}" alt="{{ $product['image_alt'] ?: $product['product_name'] }}" loading="lazy" width="960" height="1200">
             @else
                 <span class="image-placeholder" aria-hidden="true">K&amp;P</span>
             @endif

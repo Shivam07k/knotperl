@@ -19,7 +19,7 @@
                             @if($ids === [] || in_array((string) $category['category_id'], $ids, true))
                                 <a class="category-card" href="/category/{{ e($category['slug']) }}/">
                                     <span>{{ $category['category_name'] }}</span>
-                                    @if(!empty($category['category_image']))<img src="{{ r2($category['category_image']) }}" alt="" loading="lazy">@endif
+                                    @if(!empty($category['category_image']))<img src="{{ r2($category['category_image']) }}" alt="{{ $category['image_alt'] ?? '' }}" loading="lazy">@endif
                                 </a>
                             @endif
                         @endforeach

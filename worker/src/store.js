@@ -112,6 +112,16 @@ export async function setMediaAlt(env, key, alt) {
   return true;
 }
 
+/** When the hide-date check last ran, in milliseconds. Zero before the first run. */
+export async function getHideCheck(env) {
+  const object = await env.CONTENT.get('hide-check.txt');
+  return object ? Number(await object.text()) || 0 : 0;
+}
+
+export async function putHideCheck(env, time) {
+  await env.CONTENT.put('hide-check.txt', String(time));
+}
+
 /** A publish scheduled for a future time. Null when nothing is scheduled. */
 export async function getSchedule(env) {
   const object = await env.CONTENT.get(SCHEDULE_KEY);

@@ -18,15 +18,23 @@ class ContentBuilderService
         }
         $categories = $this->active($data['Categories'] ?? []);
         $products = $this->active($data['Products'] ?? []);
+        $alts = $this->mediaAlts();
+        foreach ($categories as &$category) {
+            $category['image_alt'] = $alts[trim((string) ($category['category_image'] ?? ''))] ?? '';
+        }
+        unset($category);
         $categoryById = $this->byId($categories, 'category_id');
 
         foreach ($products as &$product) {
             $product['category'] = $categoryById[$product['category_id']] ?? null;
             $product['image_url'] = R2StorageService::url($product['primary_image']);
-            $product['gallery_urls'] = array_values(array_filter(array_map(
-                static fn ($image): string => R2StorageService::url(trim($image)),
-                explode('|', (string) $product['gallery_images'])
-            )));
+            $product['image_alt'] = $alts[trim((string) $product['primary_image'])] ?? '';
+            $galleryKeys = array_values(array_filter(array_map('trim', explode('|', (string) $product['gallery_images']))));
+            $product['gallery_urls'] = array_map(
+                static fn ($image): string => R2StorageService::url($image),
+                $galleryKeys
+            );
+            $product['gallery_alts'] = array_map(static fn ($image): string => $alts[$image] ?? '', $galleryKeys);
             $product['price'] = (float) $product['sale_price'] > 0 ? (float) $product['sale_price'] : (float) $product['regular_price'];
         }
         unset($product);
@@ -123,11 +131,43 @@ class ContentBuilderService
 
     private function active(array $rows): array
     {
-        $active = array_values(array_filter($rows, static fn ($row): bool => (string) ($row['status'] ?? 'active') === 'active'));
+        $now = now()->getTimestamp();
+        $active = array_values(array_filter($rows, static function ($row) use ($now): bool {
+            if ((string) ($row['status'] ?? 'active') !== 'active') {
+                return false;
+            }
+            // An item with a "hide from the website on" time stops showing once that time has passed.
+            $hideAt = trim((string) ($row['hide_at'] ?? ''));
+            $hideTime = $hideAt === '' ? false : strtotime($hideAt);
+
+            return $hideTime === false || $hideTime > $now;
+        }));
         usort($active, static fn ($a, $b): int => (int) ($a['sort_order'] ?? 0) <=> (int) ($b['sort_order'] ?? 0));
 
         return $active;
     }
+
+    /** Alt text from the admin's media library, keyed by picture key. Empty when no export is configured. */
+    private function mediaAlts(): array
+    {
+        $path = config('cms.media_alt_json');
+        if (! is_string($path) || $path === '' || ! is_file($path)) {
+            return [];
+        }
+        $items = json_decode((string) file_get_contents($path), true);
+        if (! is_array($items)) {
+            return [];
+        }
+        $map = [];
+        foreach ($items as $item) {
+            if (! empty($item['key']) && ! empty($item['alt'])) {
+                $map[(string) $item['key']] = (string) $item['alt'];
+            }
+        }
+
+        return $map;
+    }
+
 
     private function activeBanners(array $rows): array
     {

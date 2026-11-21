@@ -10,11 +10,11 @@
             <div class="product-detail-grid">
                 <div class="product-gallery">
                     @if($product['gallery_urls'])
-                        @foreach($product['gallery_urls'] as $image)
-                            <img src="{{ $image }}" alt="{{ $product['product_name'] }}" loading="lazy">
+                        @foreach($product['gallery_urls'] as $index => $image)
+                            <img src="{{ $image }}" alt="{{ ($product['gallery_alts'][$index] ?? '') ?: $product['product_name'] }}" loading="lazy">
                         @endforeach
                     @elseif($product['image_url'])
-                        <img src="{{ $product['image_url'] }}" alt="{{ $product['product_name'] }}">
+                        <img src="{{ $product['image_url'] }}" alt="{{ $product['image_alt'] ?: $product['product_name'] }}">
                     @else
                         <span class="image-placeholder">K&amp;P</span>
                     @endif
