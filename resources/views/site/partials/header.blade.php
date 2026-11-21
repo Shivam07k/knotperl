@@ -15,6 +15,7 @@
             <input type="checkbox" id="search-check">
             <span aria-hidden="true">⌕</span>
         </label>
+        <a class="icon-button admin-link" href="{{ config('publishing.admin_url') }}" aria-label="Admin panel">Admin</a>
         <button id="menu-toggle" class="icon-button menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu" data-tip="Menu">☰</button>
     </div>
 </header>
