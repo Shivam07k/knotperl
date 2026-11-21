@@ -7,6 +7,9 @@ compatibility_date = "2026-11-21"
 binding = "CONTENT"
 bucket_name = "site-cms"
 
+[triggers]
+crons = ["*/15 * * * *"]
+
 [vars]
 ADMIN_ORIGIN = "https://knots-and-perl-admin.pages.dev"
 R2_PUBLIC_URL = "https://pub-be994af6575d4a3d9d77c4315d65d009.r2.dev"

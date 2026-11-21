@@ -8,6 +8,6 @@ test('admin shell shows only simple controls and gets screen names from the sche
   for (const label of ['Publish', 'Change picture', 'Download backup']) {
     assert.ok(html.includes(label), `missing ${label}`);
   }
-  assert.deepEqual(schema.screens.map((screen) => screen.label), ['Pages', 'Products', 'Settings']);
+  assert.deepEqual(schema.screens.map((screen) => screen.label), ['Pages', 'Products', 'Categories', 'Menu', 'Redirects', 'Settings']);
   assert.doesNotMatch(html, /slug|json|\br2\b|token|spreadsheet/i);
 });

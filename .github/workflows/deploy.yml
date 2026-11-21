@@ -2,9 +2,18 @@ name: Publish website
 
 on:
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Pages branch to deploy. "main" updates the live site. "preview" builds a private preview.'
+        required: false
+        default: main
+        type: choice
+        options:
+          - main
+          - preview
 
 concurrency:
-  group: cloudflare-pages
+  group: cloudflare-pages-${{ github.event.inputs.branch || 'main' }}
   cancel-in-progress: true
 
 jobs:
@@ -51,9 +60,10 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages deploy storage/app/generated/current --project-name=${{ secrets.CLOUDFLARE_PAGES_PROJECT }} --branch=main
+          command: pages deploy storage/app/generated/current --project-name=${{ secrets.CLOUDFLARE_PAGES_PROJECT }} --branch=${{ inputs.branch || 'main' }}
 
       - name: Report success
+        if: success() && inputs.branch != 'preview'
         env:
           STATUS_URL: ${{ secrets.STATUS_URL }}
           STATUS_SECRET: ${{ secrets.STATUS_SECRET }}
@@ -62,6 +72,18 @@ jobs:
             curl -fsS -X POST -H 'Content-Type: application/json' \
               -H "x-status-secret: $STATUS_SECRET" \
               -d '{"status":"published","message":"Website is live."}' "$STATUS_URL" || true
+          fi
+
+      - name: Report preview ready
+        if: success() && inputs.branch == 'preview'
+        env:
+          STATUS_URL: ${{ secrets.STATUS_URL }}
+          STATUS_SECRET: ${{ secrets.STATUS_SECRET }}
+        run: |
+          if [ -n "$STATUS_URL" ]; then
+            curl -fsS -X POST -H 'Content-Type: application/json' \
+              -H "x-status-secret: $STATUS_SECRET" \
+              -d '{"status":"preview-ready","message":"Preview is ready."}' "$STATUS_URL" || true
           fi
 
       - name: Report failure
@@ -73,5 +95,5 @@ jobs:
           if [ -n "$STATUS_URL" ]; then
             curl -fsS -X POST -H 'Content-Type: application/json' \
               -H "x-status-secret: $STATUS_SECRET" \
-              -d '{"status":"failed","message":"Publishing failed. Check the build log."}' "$STATUS_URL" || true
+              -d '{"status":"failed","message":"Build failed. Check the build log."}' "$STATUS_URL" || true
           fi

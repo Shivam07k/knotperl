@@ -19,14 +19,20 @@
     <header>
       <h1>Website</h1>
       <div class="header-actions">
+        <span id="role" class="role-badge" hidden>View only</span>
         <span id="status" class="status">Loading…</span>
+        <button id="preview">Preview</button>
         <button id="publish" class="primary">Publish</button>
+        <button id="logout">Log out</button>
       </div>
     </header>
 
     <nav id="screens"></nav>
     <main id="editor"></main>
-    <footer><a id="backup" href="#">Download backup</a></footer>
+    <footer>
+      <p class="hint">Changes stay in this admin until you press Publish. Publishing saves everything and puts the website live within a few minutes.</p>
+      <a id="backup" href="#">Download backup</a>
+    </footer>
   </div>
 
   <template id="image-field">

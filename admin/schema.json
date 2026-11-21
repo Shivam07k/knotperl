@@ -7,11 +7,17 @@
       "itemLabel": "page",
       "idField": "page_id",
       "idPrefix": "p",
+      "titleFrom": "title",
       "slugFrom": "title",
+      "sortable": true,
+      "help": "Pages are the regular sections of the website, such as About or Contact. Each page keeps the text and picture you enter here. Use Move up and Move down to change the order of the pages.",
+      "impact": "A page appears on the website only while Show on the website is ticked. You can change its web address, and the old address then redirects to the new one.",
       "fields": [
         { "key": "title", "label": "Page title", "type": "text", "column": "title" },
+        { "key": "slug", "label": "Web address", "type": "slug", "column": "slug", "help": "Lowercase letters, numbers and dashes. If you change it, visitors on the old address are sent to the new one." },
         { "key": "text", "label": "Text", "type": "textarea", "column": "content" },
-        { "key": "picture", "label": "Picture", "type": "image", "column": "featured_image" }
+        { "key": "picture", "label": "Picture", "type": "image", "column": "featured_image" },
+        { "key": "visible", "label": "Show on the website", "type": "checkbox", "column": "status", "onValue": "active", "offValue": "inactive", "default": true }
       ]
     },
     {
@@ -21,19 +27,95 @@
       "itemLabel": "product",
       "idField": "product_id",
       "idPrefix": "pr",
+      "titleFrom": "name",
       "slugFrom": "name",
+      "sortable": true,
+      "bulk": true,
+      "help": "Products are the items shown in the collection. The main picture is the first image visitors see. More pictures appear in the product gallery in the order you set. Use Move up and Move down to change the order products appear in the collection.",
+      "impact": "Changes appear on the collection page and on the product's own page after you press Publish. Each product must belong to a category.",
       "fields": [
         { "key": "name", "label": "Name", "type": "text", "column": "product_name" },
+        { "key": "slug", "label": "Web address", "type": "slug", "column": "slug", "help": "Lowercase letters, numbers and dashes. If you change it, visitors on the old address are sent to the new one." },
+        { "key": "category", "label": "Category", "type": "select", "column": "category_id", "optionsFrom": "categories", "labelKey": "name" },
         { "key": "price", "label": "Price", "type": "text", "column": "regular_price" },
+        { "key": "sale_price", "label": "Sale price (0 for none)", "type": "text", "column": "sale_price" },
         { "key": "description", "label": "Description", "type": "textarea", "column": "full_description" },
-        { "key": "picture", "label": "Picture", "type": "image", "column": "primary_image" }
+        { "key": "picture", "label": "Main picture", "type": "image", "column": "primary_image" },
+        { "key": "gallery", "label": "More pictures", "type": "gallery", "column": "gallery_images" },
+        { "key": "featured", "label": "Featured product", "type": "checkbox", "column": "featured", "onValue": "true", "offValue": "false", "default": false },
+        { "key": "visible", "label": "Show on the website", "type": "checkbox", "column": "status", "onValue": "active", "offValue": "inactive", "default": true }
       ]
     },
     {
+      "id": "categories",
+      "label": "Categories",
+      "tab": "Categories",
+      "itemLabel": "category",
+      "idField": "category_id",
+      "idPrefix": "c",
+      "titleFrom": "name",
+      "slugFrom": "name",
+      "sortable": true,
+      "help": "Categories group products, for example Pearls or Rings. A category can sit inside another category. Each product belongs to one category.",
+      "impact": "Categories appear on the collection page and can be linked from the Menu. You cannot delete a category while products still use it.",
+      "fields": [
+        { "key": "name", "label": "Category name", "type": "text", "column": "category_name" },
+        { "key": "slug", "label": "Web address", "type": "slug", "column": "slug", "help": "Lowercase letters, numbers and dashes. If you change it, visitors on the old address are sent to the new one." },
+        { "key": "description", "label": "Description", "type": "textarea", "column": "description" },
+        { "key": "picture", "label": "Picture", "type": "image", "column": "category_image" },
+        { "key": "parent", "label": "Sits inside", "type": "select", "column": "parent_category_id", "optionsFrom": "categories", "labelKey": "name", "emptyLabel": "Top level (no parent)", "excludeSelf": true },
+        { "key": "visible", "label": "Show on the website", "type": "checkbox", "column": "status", "onValue": "active", "offValue": "inactive", "default": true }
+      ]
+    },
+    {
+      "id": "navigation",
+      "label": "Menu",
+      "tab": "Navigation",
+      "itemLabel": "menu link",
+      "idField": "menu_id",
+      "idPrefix": "n",
+      "titleFrom": "label",
+      "sortable": true,
+      "help": "The menu sets the links in the top navigation and the footer. Use Goes to to pick a page, category or product, or type any address yourself.",
+      "impact": "Links appear in the website header or footer in the order shown here, after you press Publish. Hidden links are not shown.",
+      "fields": [
+        { "key": "label", "label": "Link text", "type": "text", "column": "label" },
+        { "key": "link", "label": "Goes to", "type": "link", "column": "url" },
+        { "key": "location", "label": "Shown in", "type": "select", "column": "menu_location", "default": "header", "options": [
+          { "value": "header", "label": "Top menu" },
+          { "value": "footer", "label": "Footer" }
+        ] },
+        { "key": "parent", "label": "Inside another link", "type": "select", "column": "parent_menu_id", "optionsFrom": "navigation", "labelKey": "label", "emptyLabel": "Top level (not inside another link)", "excludeSelf": true },
+        { "key": "newTab", "label": "Open in a new window", "type": "checkbox", "column": "open_new_tab", "onValue": "true", "offValue": "false", "default": false },
+        { "key": "visible", "label": "Show on the website", "type": "checkbox", "column": "status", "onValue": "active", "offValue": "inactive", "default": true }
+      ]
+    },
+    {
+      "id": "redirects",
+      "label": "Redirects",
+      "tab": "Redirects",
+      "itemLabel": "redirect",
+      "idField": "redirect_id",
+      "idPrefix": "rd",
+      "titleFrom": "source",
+      "help": "A redirect sends visitors from an old address to a new one, so links from other websites and search results keep working. Redirects are created automatically when you change a web address. You can also add your own.",
+      "impact": "Visitors who open the old address are sent to the new one after you press Publish.",
+      "fields": [
+        { "key": "source", "label": "Old address", "type": "text", "column": "source_url", "help": "For example /old-page/" },
+        { "key": "destination", "label": "New address", "type": "text", "column": "destination_url", "help": "For example /new-page/" },
+        { "key": "code", "label": "Kind", "type": "select", "column": "redirect_type", "default": "301", "options": [
+          { "value": "301", "label": "Permanent (301)" },
+          { "value": "302", "label": "Temporary (302)" }
+        ] },
+        { "key": "visible", "label": "Active", "type": "checkbox", "column": "status", "onValue": "active", "offValue": "inactive", "default": true }
+      ]
+    },    {
       "id": "settings",
       "label": "Settings",
       "tab": "Settings",
       "layout": "key-value",
+      "help": "Brand name, colours and contact details used across the whole website.",
+      "impact": "Changes the header, footer, colours and contact details on every page after you press Publish.",
       "fields": [
         { "key": "site_name", "label": "Brand name", "type": "text" },
         { "key": "site_tagline", "label": "Tagline", "type": "text" },
@@ -48,3 +130,4 @@
     }
   ]
 }
+

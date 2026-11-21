@@ -8,8 +8,8 @@ import {
 const schema = JSON.parse(readFileSync(new URL('../schema.json', import.meta.url), 'utf8'));
 const fixture = JSON.parse(readFileSync(new URL('../../tests/Fixtures/sheet-data.json', import.meta.url), 'utf8'));
 
-test('schema exposes exactly Pages, Products, Settings', () => {
-  assert.deepEqual(screens(schema).map((screen) => screen.label), ['Pages', 'Products', 'Settings']);
+test('schema exposes Pages, Products, Categories, Menu, Redirects and Settings', () => {
+  assert.deepEqual(screens(schema).map((screen) => screen.label), ['Pages', 'Products', 'Categories', 'Menu', 'Redirects', 'Settings']);
 });
 
 test('no technical word appears in any screen or field label', () => {
