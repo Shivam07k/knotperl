@@ -14,6 +14,14 @@ class VisitorChromeTest extends TestCase
         $this->assertStringNotContainsString('|| links[0]', $js);
     }
 
+    public function test_nav_highlight_left_is_measured_from_the_nav(): void
+    {
+        $js = (string) file_get_contents(base_path('public/js/site.js'));
+
+        $this->assertStringContainsString('linkBox.left - navBox.left', $js);
+        $this->assertStringNotContainsString('link.offsetLeft', $js);
+    }
+
     public function test_nav_has_only_one_underline_mechanism(): void
     {
         $css = (string) file_get_contents(base_path('public/css/site.css'));

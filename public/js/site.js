@@ -47,8 +47,11 @@
 
         function move(link) {
             if (!link) { return; }
-            highlight.style.width = link.offsetWidth + 'px';
-            highlight.style.left = link.offsetLeft + 'px';
+            /* offsetLeft is relative to the positioned LI, so measure against the nav instead. */
+            var linkBox = link.getBoundingClientRect();
+            var navBox = nav.getBoundingClientRect();
+            highlight.style.width = linkBox.width + 'px';
+            highlight.style.left = (linkBox.left - navBox.left) + 'px';
         }
         move(active);
         links.forEach(function (link) {
