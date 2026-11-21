@@ -62,7 +62,7 @@
                     <div class="stats-grid">
                         @foreach($ids as $stat)
                             @php($parts = array_pad(explode(':', $stat, 2), 2, ''))
-                            <div><strong>{{ $parts[0] }}</strong><span>{{ $parts[1] }}</span></div>
+                            <div><strong>{{ trim($parts[0]) }}</strong><span>{{ trim($parts[1]) }}</span></div>
                         @endforeach
                     </div>
                     @break

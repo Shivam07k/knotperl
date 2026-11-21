@@ -9,7 +9,7 @@ const IMAGE_TYPES = 'image/jpeg,image/png,image/webp,image/gif';
 const HISTORY = '__history';
 const MEDIA = '__media';
 const NAV_GROUPS = [
-  { title: 'Content', ids: ['pages', 'products', 'categories', 'navigation', 'redirects'] },
+  { title: 'Content', ids: ['pages', 'sections', 'products', 'categories', 'navigation', 'redirects'] },
   { title: 'Library', ids: [MEDIA] },
   { title: 'Site', ids: ['settings'] },
   { title: 'Activity', ids: [HISTORY] },
@@ -289,7 +289,12 @@ function galleryControl(value, change) {
 }
 
 function makeField(field, value, onChange, itemId) {
-  const change = (next) => { onChange(next); markDirty(); };
+  const change = (next) => {
+    onChange(next);
+    markDirty();
+    // Some fields change which other fields apply, such as a section's type.
+    if (field.rerender) renderScreen();
+  };
   const wrapper = document.createElement('div');
   wrapper.className = 'field';
   const id = nextFieldId();
@@ -416,13 +421,83 @@ function makeField(field, value, onChange, itemId) {
   return wrapper;
 }
 
+/** Items a section shows. What is offered depends on the block type, so this control is built per type. */
+const PRODUCT_BLOCKS = ['Featured Products', 'New Arrivals', 'Product Grid'];
+
+function plainLabel(text) {
+  const label = document.createElement('label');
+  label.textContent = text;
+  return label;
+}
+
+function pickList(options, raw, change) {
+  const picked = new Set(String(raw ?? '').split('|').map((value) => value.trim()).filter(Boolean));
+  const list = document.createElement('div');
+  list.className = 'pick-list';
+  const choices = options.filter((option) => option.value);
+  if (!choices.length) list.append(hint('Nothing to pick yet. Add some first.'));
+  for (const option of choices) {
+    const row = document.createElement('label');
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.checked = picked.has(option.value);
+    input.onchange = () => {
+      if (input.checked) picked.add(option.value);
+      else picked.delete(option.value);
+      change([...picked].join('|'));
+    };
+    row.append(input, document.createTextNode(` ${option.label}`));
+    list.append(row);
+  }
+  return list;
+}
+
+function linesControl(raw, change) {
+  const area = document.createElement('textarea');
+  area.value = String(raw ?? '').split('|').join('\n');
+  area.oninput = () => change(area.value.split('\n').map((line) => line.trim()).filter(Boolean).join('|'));
+  return area;
+}
+
+function itemsControl(type, raw, change) {
+  const wrap = document.createElement('div');
+  wrap.className = 'field';
+  if (type === 'Featured Categories') {
+    wrap.append(plainLabel('Categories to show'));
+    wrap.append(pickList(optionsFor(states, { optionsFrom: 'categories', labelKey: 'name' }, ''), raw, change));
+    wrap.append(hint('Leave all unticked to show every category.'));
+    return wrap;
+  }
+  if (PRODUCT_BLOCKS.includes(type)) {
+    wrap.append(plainLabel('Products to show'));
+    wrap.append(pickList(optionsFor(states, { optionsFrom: 'products', labelKey: 'name' }, ''), raw, change));
+    wrap.append(hint('Leave all unticked to show every product.'));
+    return wrap;
+  }
+  if (type === 'Image Gallery') {
+    wrap.append(plainLabel('Pictures'));
+    wrap.append(galleryControl(raw, change));
+    return wrap;
+  }
+  if (type === 'Statistics') {
+    wrap.append(plainLabel('Numbers and labels'));
+    wrap.append(linesControl(raw, change));
+    wrap.append(hint('One per line, as Number : Label, for example 500+ : Pieces made by hand.'));
+    return wrap;
+  }
+  return null;
+}
+
 /** Groups fields under plain headings, in the order the schema lists them. */
 function groupedFields(screen, values, onChange, itemId) {
   const groups = new Map();
   for (const field of screen.fields) {
     const name = field.group ?? 'Details';
     if (!groups.has(name)) groups.set(name, []);
-    groups.get(name).push(makeField(field, values[field.key], (value) => onChange(field.key, value), itemId));
+    const node = field.type === 'items'
+      ? itemsControl(values.type, values[field.key], (value) => { onChange(field.key, value); markDirty(); })
+      : makeField(field, values[field.key], (value) => onChange(field.key, value), itemId);
+    if (node) groups.get(name).push(node);
   }
   const wrapper = document.createDocumentFragment();
   for (const [name, nodes] of groups) {
@@ -518,6 +593,10 @@ function rowSummary(screen, item) {
     case 'categories': return item.parent ? `Inside ${categoryName(item.parent)}` : 'Top level';
     case 'navigation': return `${item.location === 'footer' ? 'Footer' : 'Top menu'} · ${item.link || 'No link yet'}`;
     case 'redirects': return `${item.source || '?'} goes to ${item.destination || '?'}`;
+    case 'sections': {
+      const page = states.pages?.items.find((entry) => entry.slug === item.page);
+      return page ? `On ${page.title || 'Untitled'}` : 'Not on a page yet';
+    }
     default: return '';
   }
 }

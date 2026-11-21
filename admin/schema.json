@@ -64,6 +64,150 @@
       "duplicable": false
     },
     {
+      "id": "sections",
+      "label": "Sections",
+      "tab": "Sections",
+      "itemLabel": "section",
+      "idField": "section_id",
+      "idPrefix": "s",
+      "titleFrom": "type",
+      "sortable": true,
+      "help": "Sections are the blocks on a page, such as a hero, a grid of products or a newsletter sign-up. Pick the page, choose the block type, then fill in what it shows.",
+      "impact": "A block appears on its page after you publish. Blocks on the same page appear in the order shown here.",
+      "fields": [
+        {
+          "key": "type",
+          "label": "Block type",
+          "type": "select",
+          "column": "section_type",
+          "group": "Block",
+          "rerender": true,
+          "default": "Hero",
+          "options": [
+            {
+              "value": "Hero",
+              "label": "Hero"
+            },
+            {
+              "value": "Featured Categories",
+              "label": "Featured Categories"
+            },
+            {
+              "value": "Featured Products",
+              "label": "Featured Products"
+            },
+            {
+              "value": "New Arrivals",
+              "label": "New Arrivals"
+            },
+            {
+              "value": "Product Grid",
+              "label": "Product Grid"
+            },
+            {
+              "value": "About Us",
+              "label": "About Us"
+            },
+            {
+              "value": "Services",
+              "label": "Services"
+            },
+            {
+              "value": "Testimonials",
+              "label": "Testimonials"
+            },
+            {
+              "value": "Statistics",
+              "label": "Statistics"
+            },
+            {
+              "value": "Image Gallery",
+              "label": "Image Gallery"
+            },
+            {
+              "value": "Promotional Banner",
+              "label": "Promotional Banner"
+            },
+            {
+              "value": "Contact Information",
+              "label": "Contact Information"
+            },
+            {
+              "value": "Newsletter",
+              "label": "Newsletter"
+            },
+            {
+              "value": "Custom HTML",
+              "label": "Custom HTML"
+            }
+          ]
+        },
+        {
+          "key": "page",
+          "label": "Shown on page",
+          "type": "select",
+          "column": "page_slug",
+          "group": "Block",
+          "optionsFrom": "pages",
+          "valueKey": "slug",
+          "labelKey": "title"
+        },
+        {
+          "key": "title",
+          "label": "Heading",
+          "type": "text",
+          "column": "section_title",
+          "group": "Text"
+        },
+        {
+          "key": "subtitle",
+          "label": "Small line above the heading",
+          "type": "text",
+          "column": "section_subtitle",
+          "group": "Text"
+        },
+        {
+          "key": "text",
+          "label": "Text",
+          "type": "textarea",
+          "column": "section_description",
+          "group": "Text",
+          "help": "For Custom HTML, this is the HTML code."
+        },
+        {
+          "key": "items",
+          "label": "Items",
+          "type": "items",
+          "column": "section_data",
+          "group": "Items"
+        },
+        {
+          "key": "background",
+          "label": "Background colour",
+          "type": "color",
+          "column": "background_color",
+          "group": "Style"
+        },
+        {
+          "key": "textColour",
+          "label": "Text colour",
+          "type": "color",
+          "column": "text_color",
+          "group": "Style"
+        },
+        {
+          "key": "visible",
+          "label": "Show on the website",
+          "type": "checkbox",
+          "column": "status",
+          "onValue": "active",
+          "offValue": "inactive",
+          "group": "Visibility",
+          "default": true
+        }
+      ]
+    },
+    {
       "id": "products",
       "label": "Products",
       "tab": "Products",

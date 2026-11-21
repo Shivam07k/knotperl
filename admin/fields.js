@@ -93,10 +93,15 @@ export function optionsFor(states, field, itemId) {
   if (field.emptyLabel !== undefined) options.push({ value: '', label: field.emptyLabel });
   if (field.options) return [...options, ...field.options];
   if (field.optionsFrom) {
+    const valueKey = field.valueKey ?? 'id';
     for (const item of states[field.optionsFrom]?.items ?? []) {
       if (!item.id) continue;
       if (field.excludeSelf && String(item.id) === String(itemId)) continue;
-      options.push({ value: String(item.id), label: String(item[field.labelKey] || item.id) });
+      let value = item[valueKey];
+      // A page's web address is only set once saved, so derive it from the title for unsaved pages.
+      if (valueKey === 'slug' && !value) value = slugify(item.title ?? '');
+      if (value === undefined || value === '') continue;
+      options.push({ value: String(value), label: String(item[field.labelKey] || item.id) });
     }
   }
   return options;
