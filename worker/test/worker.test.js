@@ -53,6 +53,18 @@ test('wrong password is rejected and no session cookie is issued', async () => {
   assert.equal(response.status, 401);
 });
 
+test('session cookie works across the admin and worker sites', async () => {
+  const env = makeEnv();
+  const response = await handle(new Request('https://worker.test/api/login', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', origin: env.ADMIN_ORIGIN },
+    body: JSON.stringify({ password: 'secret123' }),
+  }), env);
+  const cookie = response.headers.get('set-cookie');
+  assert.match(cookie, /SameSite=None/i);
+  assert.match(cookie, /Secure/i);
+});
+
 test('expired session cannot read or save content', async () => {
   const env = makeEnv();
   const cookie = await login(env);

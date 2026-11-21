@@ -47,10 +47,11 @@ export async function verifySession(cookieHeader, env, now = Date.now()) {
   }
 }
 
+// Admin (pages.dev) and worker (workers.dev) are cross-site, so Lax/Strict would block the cookie.
 export function sessionCookie(token) {
-  return `${COOKIE}=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=28800`;
+  return `${COOKIE}=${token}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=28800`;
 }
 
 export function expiredCookie() {
-  return `${COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`;
+  return `${COOKIE}=; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=0`;
 }
