@@ -59,6 +59,29 @@
           "column": "hide_at",
           "group": "Visibility",
           "help": "Optional. Leave empty to keep it visible. It is hidden automatically at this time."
+        },
+        {
+          "key": "meta_title",
+          "label": "Search title",
+          "type": "text",
+          "column": "meta_title",
+          "group": "Search (SEO)",
+          "help": "Shown in search results and browser tabs. Keep it under 60 characters."
+        },
+        {
+          "key": "meta_description",
+          "label": "Search description",
+          "type": "textarea",
+          "column": "meta_description",
+          "group": "Search (SEO)",
+          "help": "A short summary for search results. Aim for 120 to 160 characters."
+        },
+        {
+          "key": "meta_keywords",
+          "label": "Keywords",
+          "type": "text",
+          "column": "meta_keywords",
+          "group": "Search (SEO)"
         }
       ],
       "duplicable": false
@@ -579,6 +602,308 @@
           "label": "Address",
           "type": "textarea",
           "group": "Contact"
+        }
+      ]
+    },
+    {
+      "id": "banners",
+      "label": "Banners",
+      "tab": "Banners",
+      "itemLabel": "banner",
+      "idField": "banner_id",
+      "idPrefix": "b",
+      "titleFrom": "title",
+      "sortable": true,
+      "help": "Banners are the large promotional images shown on the site, for example a new collection or a sale.",
+      "impact": "A banner appears where a Promotional Banner block is placed. It shows only between its start and end dates, when both are set.",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Headline",
+          "type": "text",
+          "column": "title",
+          "group": "Basics"
+        },
+        {
+          "key": "subtitle",
+          "label": "Small line above the headline",
+          "type": "text",
+          "column": "subtitle",
+          "group": "Basics"
+        },
+        {
+          "key": "description",
+          "label": "Text",
+          "type": "textarea",
+          "column": "description",
+          "group": "Basics"
+        },
+        {
+          "key": "desktop",
+          "label": "Picture",
+          "type": "image",
+          "column": "desktop_image",
+          "group": "Pictures"
+        },
+        {
+          "key": "mobile",
+          "label": "Phone picture (optional)",
+          "type": "image",
+          "column": "mobile_image",
+          "group": "Pictures"
+        },
+        {
+          "key": "buttonText",
+          "label": "Button text",
+          "type": "text",
+          "column": "button_text",
+          "group": "Button"
+        },
+        {
+          "key": "buttonUrl",
+          "label": "Button goes to",
+          "type": "link",
+          "column": "button_url",
+          "group": "Button"
+        },
+        {
+          "key": "colour",
+          "label": "Background colour",
+          "type": "color",
+          "column": "background_color",
+          "group": "Style"
+        },
+        {
+          "key": "start",
+          "label": "Show from",
+          "type": "date",
+          "column": "start_date",
+          "group": "Schedule"
+        },
+        {
+          "key": "end",
+          "label": "Show until",
+          "type": "date",
+          "column": "end_date",
+          "group": "Schedule"
+        },
+        {
+          "key": "visible",
+          "label": "Show on the website",
+          "type": "checkbox",
+          "column": "status",
+          "onValue": "active",
+          "offValue": "inactive",
+          "group": "Visibility",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "testimonials",
+      "label": "Testimonials",
+      "tab": "Testimonials",
+      "itemLabel": "testimonial",
+      "idField": "testimonial_id",
+      "idPrefix": "t",
+      "titleFrom": "name",
+      "sortable": true,
+      "help": "Testimonials are short quotes from customers, shown in the Testimonials block.",
+      "impact": "Quotes appear wherever a Testimonials block is placed, in the order shown here.",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Customer name",
+          "type": "text",
+          "column": "customer_name",
+          "group": "Basics"
+        },
+        {
+          "key": "designation",
+          "label": "Role or place (optional)",
+          "type": "text",
+          "column": "customer_designation",
+          "group": "Basics"
+        },
+        {
+          "key": "text",
+          "label": "What they said",
+          "type": "textarea",
+          "column": "testimonial_text",
+          "group": "Basics"
+        },
+        {
+          "key": "rating",
+          "label": "Stars",
+          "type": "select",
+          "column": "rating",
+          "group": "Basics",
+          "default": "5",
+          "options": [
+            {
+              "value": "5",
+              "label": "5 stars"
+            },
+            {
+              "value": "4",
+              "label": "4 stars"
+            },
+            {
+              "value": "3",
+              "label": "3 stars"
+            },
+            {
+              "value": "2",
+              "label": "2 stars"
+            },
+            {
+              "value": "1",
+              "label": "1 stars"
+            }
+          ]
+        },
+        {
+          "key": "picture",
+          "label": "Picture (optional)",
+          "type": "image",
+          "column": "customer_image",
+          "group": "Picture"
+        },
+        {
+          "key": "visible",
+          "label": "Show on the website",
+          "type": "checkbox",
+          "column": "status",
+          "onValue": "active",
+          "offValue": "inactive",
+          "group": "Visibility",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "services",
+      "label": "Services",
+      "tab": "Services",
+      "itemLabel": "service",
+      "idField": "service_id",
+      "idPrefix": "sv",
+      "titleFrom": "title",
+      "slugFrom": "title",
+      "sortable": true,
+      "help": "Services are the things you offer beyond products, such as repairs or custom commissions.",
+      "impact": "Services appear in any Services block, in the order shown here.",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Service name",
+          "type": "text",
+          "column": "title",
+          "group": "Basics"
+        },
+        {
+          "key": "slug",
+          "label": "Web address",
+          "type": "slug",
+          "column": "slug",
+          "group": "Basics"
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "type": "textarea",
+          "column": "description",
+          "group": "Basics"
+        },
+        {
+          "key": "picture",
+          "label": "Picture",
+          "type": "image",
+          "column": "image",
+          "group": "Picture"
+        },
+        {
+          "key": "visible",
+          "label": "Show on the website",
+          "type": "checkbox",
+          "column": "status",
+          "onValue": "active",
+          "offValue": "inactive",
+          "group": "Visibility",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "label": "Contact details",
+      "tab": "Contact",
+      "itemLabel": "contact detail",
+      "idField": "contact_id",
+      "idPrefix": "ct",
+      "titleFrom": "label",
+      "sortable": true,
+      "help": "Contact details are the ways customers can reach you: email, phone, address, and social links.",
+      "impact": "These appear in any Contact Information block and on the contact page, in the order shown here.",
+      "fields": [
+        {
+          "key": "label",
+          "label": "Label",
+          "type": "text",
+          "column": "label",
+          "group": "Basics",
+          "help": "For example Studio, Email or Instagram."
+        },
+        {
+          "key": "value",
+          "label": "Details",
+          "type": "text",
+          "column": "value",
+          "group": "Basics"
+        },
+        {
+          "key": "type",
+          "label": "Kind",
+          "type": "select",
+          "column": "type",
+          "group": "Basics",
+          "default": "email",
+          "options": [
+            {
+              "value": "email",
+              "label": "Email"
+            },
+            {
+              "value": "phone",
+              "label": "Phone"
+            },
+            {
+              "value": "whatsapp",
+              "label": "Whatsapp"
+            },
+            {
+              "value": "address",
+              "label": "Address"
+            },
+            {
+              "value": "map",
+              "label": "Map"
+            },
+            {
+              "value": "social",
+              "label": "Social"
+            }
+          ]
+        },
+        {
+          "key": "visible",
+          "label": "Show on the website",
+          "type": "checkbox",
+          "column": "status",
+          "onValue": "active",
+          "offValue": "inactive",
+          "group": "Visibility",
+          "default": true
         }
       ]
     }

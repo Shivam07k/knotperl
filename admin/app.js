@@ -1,4 +1,5 @@
 import { IMAGE_BASE_URL, PREVIEW_URL, WORKER_URL } from './config.js';
+import { previewDocument } from './preview.js';
 import {
   applyRedirects, blockersFor, fromContentJson, linkOptions, makeBlankItem, nextId, normalizeSlugs, optionsFor,
   redirectsForSlugChanges, screens, slugProblems, toContentJson,
@@ -11,7 +12,7 @@ const MEDIA = '__media';
 const NAV_GROUPS = [
   { title: 'Content', ids: ['pages', 'sections', 'products', 'categories', 'navigation', 'redirects'] },
   { title: 'Library', ids: [MEDIA] },
-  { title: 'Site', ids: ['settings'] },
+  { title: 'Site', ids: ['banners', 'testimonials', 'services', 'contact', 'settings'] },
   { title: 'Activity', ids: [HISTORY] },
 ];
 const ROLE_NAMES = { admin: 'administrator', viewer: 'view-only account' };
@@ -94,11 +95,15 @@ async function signIn() {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ password: el('password').value }),
     });
-    el('password').value = '';
-    await start();
   } catch (error) {
     el('login-error').textContent = error.message;
+    return;
   }
+  el('password').value = '';
+  await start().catch((error) => {
+    console.error(error);
+    setStatus(`Something went wrong: ${error.message}`, true);
+  });
 }
 
 async function signOut() {
@@ -411,7 +416,19 @@ function makeField(field, value, onChange, itemId) {
     if (field.help) wrapper.append(hint(field.help));
     const input = document.createElement(field.type === 'textarea' ? 'textarea' : 'input');
     input.id = id;
-    if (input.tagName === 'INPUT') input.type = ['color', 'email', 'tel'].includes(field.type) ? field.type : 'text';
+    if (input.tagName === 'INPUT') input.type = ['color', 'email', 'tel', 'date'].includes(field.type) ? field.type : 'text';
+    if (field.type === 'color') {
+      // An empty colour means "use the site's default". Show white and offer a way to clear it.
+      input.value = value || '#ffffff';
+      input.oninput = () => change(input.value);
+      const row = document.createElement('div');
+      row.className = 'colour-row';
+      const clear = actionButton('Use default', 'Remove the colour and use the site default', !value, () => change(''));
+      clear.classList.add('ghost');
+      row.append(input, clear);
+      wrapper.append(row);
+      return wrapper;
+    }
     input.value = value ?? '';
     input.oninput = () => change(input.value);
     wrapper.append(input);
@@ -510,75 +527,10 @@ function groupedFields(screen, values, onChange, itemId) {
   return wrapper;
 }
 
-/* ---------- live preview ---------- */
+/* ---------- helpers ---------- */
 
 function categoryName(id) {
   return states.categories?.items.find((item) => String(item.id) === String(id))?.name ?? '';
-}
-
-function previewCard(screen, item) {
-  const card = document.createElement('aside');
-  card.className = 'preview-card';
-  card.setAttribute('aria-label', 'Preview of this item');
-  card.append(heading('p', 'Preview', 'preview-label'));
-
-  if (screen.id === 'products') {
-    const picture = previewUrl(item.picture);
-    const frame = document.createElement('div');
-    frame.className = 'preview-picture';
-    if (picture) {
-      const image = document.createElement('img');
-      image.alt = '';
-      image.src = picture;
-      frame.append(image);
-    } else {
-      frame.textContent = 'No main picture yet';
-    }
-    card.append(frame, heading('h4', item.name || 'Untitled'));
-    const price = Number(item.sale_price) > 0 ? item.sale_price : item.price;
-    const line = document.createElement('p');
-    line.className = 'preview-meta';
-    line.textContent = [categoryName(item.category), price ? `Price ${price}` : ''].filter(Boolean).join(' · ');
-    card.append(line);
-  } else if (screen.id === 'pages') {
-    card.append(heading('h4', item.title || 'Untitled'));
-    const text = document.createElement('p');
-    text.className = 'preview-body';
-    const body = String(item.text ?? '');
-    text.textContent = body.length > 220 ? `${body.slice(0, 220)}…` : body || 'No text yet.';
-    card.append(text);
-  } else if (screen.id === 'categories') {
-    const picture = previewUrl(item.picture);
-    if (picture) {
-      const frame = document.createElement('div');
-      frame.className = 'preview-picture';
-      const image = document.createElement('img');
-      image.alt = '';
-      image.src = picture;
-      frame.append(image);
-      card.append(frame);
-    }
-    card.append(heading('h4', item.name || 'Untitled'));
-    card.append(Object.assign(document.createElement('p'), { className: 'preview-body', textContent: item.description || 'No description yet.' }));
-  } else if (screen.id === 'navigation') {
-    const pill = document.createElement('span');
-    pill.className = 'preview-pill';
-    pill.textContent = item.label || 'Link text';
-    const where = document.createElement('p');
-    where.className = 'preview-meta';
-    where.textContent = `${item.location === 'footer' ? 'Shown in the footer' : 'Shown in the top menu'}${item.visible ? '' : ' (hidden)'}`;
-    card.append(pill, where);
-  } else {
-    return null;
-  }
-
-  if (item.visible === false) {
-    const note = document.createElement('p');
-    note.className = 'preview-note';
-    note.textContent = 'Hidden from the website.';
-    card.append(note);
-  }
-  return card;
 }
 
 /* ---------- collection screens (list and editor) ---------- */
@@ -873,20 +825,14 @@ function detailPane(screen, items, item) {
   body.className = 'detail-body';
   const form = document.createElement('div');
   form.className = 'detail-form';
-  let preview = previewCard(screen, item);
-  // Re-draw the preview and the list name as the editor types, so the effect of each change is visible at once.
   const refresh = (key, value) => {
     item[key] = value;
-    const next = previewCard(screen, item);
-    if (preview && next) preview.replaceWith(next);
-    else if (next) body.append(next);
-    preview = next ?? preview;
+    schedulePreview(screen, item);
     const openName = document.querySelector('.item-row.open .row-name');
     if (openName) openName.textContent = item[screen.titleFrom] || 'Untitled';
   };
   form.append(groupedFields(screen, item, refresh, item.id));
   body.append(form);
-  if (preview) body.append(preview);
   pane.append(body);
   return pane;
 }
@@ -896,11 +842,58 @@ function renderCollection(editor, screen) {
   const openId = openIds[screen.id];
   const item = items.find((entry) => String(entry.id) === String(openId)) ?? items[0];
   if (item) openIds[screen.id] = String(item.id);
+  const hasPreview = previewDocument(screen.id, item, states) !== null;
   const workspace = document.createElement('div');
-  workspace.className = 'workspace';
+  workspace.className = hasPreview ? 'workspace with-preview' : 'workspace';
   workspace.append(listPane(screen, items, item), detailPane(screen, items, item));
+  if (hasPreview) workspace.append(previewPane(screen, item));
   editor.append(workspace);
 }
+
+/* ---------- live preview pane ---------- */
+
+let previewFrame = null;
+let previewTimer = null;
+
+function previewPane(screen, item) {
+  const pane = document.createElement('section');
+  pane.className = 'preview-pane';
+  const header = document.createElement('div');
+  header.className = 'preview-head';
+  header.append(heading('p', 'Live preview'), hint('Shows your unsaved changes. Click a block to edit it.'));
+  const frame = document.createElement('iframe');
+  frame.className = 'preview-frame';
+  frame.title = 'Live preview of the website';
+  // Scripts run only to report clicks back to the editor. The page itself gets no access to the admin.
+  frame.setAttribute('sandbox', 'allow-scripts');
+  frame.srcdoc = previewDocument(screen.id, item, states) ?? '';
+  previewFrame = frame;
+  pane.append(header, frame);
+  return pane;
+}
+
+/** Re-draws the preview shortly after the editor changes, so typing does not redraw on every key. */
+function schedulePreview(screen, item) {
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(() => {
+    if (!previewFrame?.isConnected) return;
+    const doc = previewDocument(screen.id, item, states);
+    if (doc !== null) previewFrame.srcdoc = doc;
+  }, 150);
+}
+
+window.addEventListener('message', (event) => {
+  if (!previewFrame || event.source !== previewFrame.contentWindow) return;
+  if (event.data?.type !== 'open-item') return;
+  const [target, id] = String(event.data.target ?? '').split(':');
+  if (!states[target] || !id) return;
+  screenId = target;
+  openIds[target] = id;
+  selected = new Set();
+  renderNav();
+  renderScreen();
+});
+
 
 /* ---------- settings ---------- */
 
@@ -1323,4 +1316,7 @@ document.addEventListener('keydown', (event) => {
 window.addEventListener('beforeunload', (event) => {
   if (dirty) event.preventDefault();
 });
-start();
+start().catch((error) => {
+  console.error(error);
+  setStatus(`Something went wrong: ${error.message}`, true);
+});
