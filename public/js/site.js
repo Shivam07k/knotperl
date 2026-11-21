@@ -38,8 +38,11 @@
         highlight.setAttribute('aria-hidden', 'true');
         nav.appendChild(highlight);
 
-        var path = window.location.pathname.replace(/index\.html$/, '') || '/';
-        var active = links.filter(function (a) { return (a.getAttribute('href') || '') === path; })[0] || links[0];
+        var normalize = function (value) {
+            return (value || '').replace(/index\.html$/, '').replace(/\/+$/, '') || '/';
+        };
+        var path = normalize(window.location.pathname);
+        var active = links.filter(function (a) { return normalize(a.getAttribute('href')) === path; })[0];
         if (active && !active.hasAttribute('aria-current')) { active.setAttribute('aria-current', 'page'); }
 
         function move(link) {
