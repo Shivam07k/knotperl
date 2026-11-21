@@ -1,5 +1,6 @@
 name = "site-admin-api"
 main = "src/index.js"
+account_id = "a151528af43d01bdbdd3e33d1730ab7a"
 compatibility_date = "2026-11-21"
 
 [[r2_buckets]]
@@ -7,7 +8,7 @@ binding = "CONTENT"
 bucket_name = "site-cms"
 
 [vars]
-ADMIN_ORIGIN = "https://admin.example.com"
-R2_PUBLIC_URL = "https://images.example.com"
+ADMIN_ORIGIN = "https://knots-and-perl-admin.pages.dev"
+R2_PUBLIC_URL = "https://pub-be994af6575d4a3d9d77c4315d65d009.r2.dev"
 GITHUB_REPOSITORY = "Shivam07k/knotperl"
 GITHUB_WORKFLOW = "deploy.yml"
