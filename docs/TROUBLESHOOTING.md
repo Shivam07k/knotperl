@@ -2,7 +2,7 @@
 
 | Symptom | Cause / fix |
 |---|---|
-| `Please sign in again` | The admin session expired (eight hours) or the worker URL is wrong. Sign in again. |
+| `Please sign in again` | Session expired (eight hours), wrong worker URL, or the browser blocked the cross-site cookie. The login cookie must stay `SameSite=None` because admin and worker are on different domains. |
 | `Publishing is not configured yet` | Set the worker's `GITHUB_TOKEN` secret and GitHub secrets from `CLOUDFLARE_SETUP.md`. |
 | `Missing section: Products` or missing columns | The content file was edited outside the admin. Restore it from a backup. |
 | `Duplicate slug` / `Category ID does not exist` | Fix the referenced row; validation errors block publishing in strict mode. |

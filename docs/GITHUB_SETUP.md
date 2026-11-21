@@ -25,7 +25,7 @@ or Cloudflare, never in the admin site.
 
 Editors press **Publish** in the browser admin. The worker dispatches
 `workflow_dispatch`; the workflow downloads `content.json` from R2, generates the
-site and deploys it with `cloudflare/pages-action`.
+site and deploys it with `cloudflare/wrangler-action@v4` using `pages deploy`.
 
 For a local dry run:
 

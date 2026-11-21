@@ -19,6 +19,7 @@ php artisan cms:validate
 php artisan test
 ```
 
+Deploy: [docs/DEPLOYING.md](docs/DEPLOYING.md) ·
 Setup: [docs/CLOUDFLARE_SETUP.md](docs/CLOUDFLARE_SETUP.md) ·
 Editing: [docs/UPDATING_CONTENT.md](docs/UPDATING_CONTENT.md) ·
 Docs index: [docs/DOCS_INDEX.md](docs/DOCS_INDEX.md)
