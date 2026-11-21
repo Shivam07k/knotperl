@@ -186,3 +186,22 @@ test('publish failure reports GitHub status and message', async () => {
     globalThis.fetch = originalFetch;
   }
 });
+
+test('publish dispatch sends only the ref because the workflow has no inputs', async () => {
+  const env = makeEnv();
+  const originalFetch = globalThis.fetch;
+  let dispatchedBody;
+  globalThis.fetch = async (url, options) => {
+    dispatchedBody = JSON.parse(options.body);
+    return new Response(null, { status: 204 });
+  };
+  try {
+    const cookie = await login(env);
+    await handle(new Request('https://worker.test/api/publish', {
+      method: 'POST', headers: { cookie, origin: env.ADMIN_ORIGIN },
+    }), env);
+    assert.deepEqual(dispatchedBody, { ref: 'main' });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

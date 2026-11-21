@@ -108,7 +108,7 @@ export async function handle(request, env, now = Date.now()) {
           'content-type': 'application/json',
           'user-agent': 'site-admin',
         },
-        body: JSON.stringify({ ref: 'main', inputs: { note: 'Publish from admin' } }),
+        body: JSON.stringify({ ref: 'main' }),
       },
     );
     if (!upstream.ok) {
