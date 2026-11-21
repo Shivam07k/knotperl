@@ -3,36 +3,51 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
   <title>Website admin</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <section id="login" class="card" hidden>
-    <h1>Website admin</h1>
-    <label for="password">Password</label>
-    <input id="password" type="password" autocomplete="current-password">
-    <button id="sign-in">Sign in</button>
-    <p id="login-error" class="error"></p>
+  <section id="login" class="signin" hidden>
+    <div class="signin-card">
+      <p class="brand-line">Knots &amp; Perl</p>
+      <h1>Website admin</h1>
+      <p class="muted">Sign in to edit the website.</p>
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password">
+      <button id="sign-in" class="primary wide">Sign in</button>
+      <p id="login-error" class="error" role="alert"></p>
+    </div>
   </section>
 
   <div id="app" hidden>
-    <header>
-      <h1>Website</h1>
-      <div class="header-actions">
+    <aside class="sidebar">
+      <div class="brand">
+        <p class="brand-name">Knots &amp; Perl</p>
+        <p class="brand-sub">Website admin</p>
+      </div>
+      <nav id="screens" aria-label="Sections"></nav>
+      <div class="sidebar-foot">
         <span id="role" class="role-badge" hidden>View only</span>
-        <span id="status" class="status">Loading…</span>
-        <button id="preview">Preview</button>
-        <button id="publish" class="primary">Publish</button>
-        <button id="logout">Log out</button>
+        <a id="backup" href="#">Download backup</a>
+        <button id="logout" class="ghost">Log out</button>
+      </div>
+    </aside>
+
+    <header class="topbar">
+      <div class="topbar-title">
+        <h1 id="screen-title">Website</h1>
+        <p id="status" class="status" aria-live="polite">Loading…</p>
+      </div>
+      <div class="topbar-actions">
+        <button id="save" class="secondary" disabled title="Save your changes without publishing (Ctrl+S)">Save changes</button>
+        <button id="preview" class="secondary" title="Build a private preview of the saved changes">Preview</button>
+        <button id="publish" class="primary" title="Save everything and put the website live">Publish</button>
       </div>
     </header>
 
-    <nav id="screens"></nav>
-    <main id="editor"></main>
-    <footer>
-      <p class="hint">Changes stay in this admin until you press Publish. Publishing saves everything and puts the website live within a few minutes.</p>
-      <a id="backup" href="#">Download backup</a>
-    </footer>
+    <main id="editor" tabindex="-1"></main>
+    <div id="toasts" class="toasts" aria-live="polite"></div>
   </div>
 
   <template id="image-field">

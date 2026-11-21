@@ -8,7 +8,15 @@ const el = (id) => document.getElementById(id);
 const IMAGE_TYPES = 'image/jpeg,image/png,image/webp,image/gif';
 const HISTORY = '__history';
 const MEDIA = '__media';
+const NAV_GROUPS = [
+  { title: 'Content', ids: ['pages', 'products', 'categories', 'navigation', 'redirects'] },
+  { title: 'Library', ids: [MEDIA] },
+  { title: 'Site', ids: ['settings'] },
+  { title: 'Activity', ids: [HISTORY] },
+];
 const ROLE_NAMES = { admin: 'administrator', viewer: 'view-only account' };
+const BUSY = ['publishing', 'previewing'];
+
 let schema;
 let content;
 let contentVersion = '';
@@ -17,7 +25,11 @@ let screenId;
 let dirty = false;
 let selected = new Set();
 let selectedFor = null;
+let listQuery = '';
+let listFilter = 'all';
+const openIds = {};
 const states = {};
+let fieldCounter = 0;
 
 async function request(path, options = {}) {
   const response = await fetch(WORKER_URL + path, { credentials: 'include', ...options });
@@ -34,28 +46,45 @@ async function api(path, options) {
   return (await request(path, options)).body;
 }
 
+/* ---------- feedback ---------- */
+
 function setStatus(message, isError = false) {
   const status = el('status');
   status.textContent = message;
   status.classList.toggle('error', isError);
 }
 
+function toast(message, isError = false) {
+  const node = document.createElement('div');
+  node.className = `toast${isError ? ' error' : ''}`;
+  node.setAttribute('role', isError ? 'alert' : 'status');
+  node.textContent = message;
+  const stack = el('toasts');
+  stack.append(node);
+  while (stack.children.length > 3) stack.firstElementChild.remove();
+  setTimeout(() => node.remove(), isError ? 7000 : 3500);
+}
+
+function updateButtons() {
+  const admin = role === 'admin';
+  el('save').hidden = !admin;
+  el('preview').hidden = !admin;
+  el('publish').hidden = !admin;
+  el('save').disabled = !dirty;
+}
+
 function markDirty() {
   dirty = true;
-  setStatus('Unsaved changes. Press Publish to put them on the website.');
+  setStatus('Unsaved changes. Save, then publish when you are ready.');
+  updateButtons();
 }
+
+/* ---------- session ---------- */
 
 function showSignIn(message = '') {
   el('login').hidden = false;
   el('app').hidden = true;
   el('login-error').textContent = message;
-}
-
-function applyRole() {
-  const admin = role === 'admin';
-  el('publish').hidden = !admin;
-  el('preview').hidden = !admin;
-  el('role').hidden = admin;
 }
 
 async function signIn() {
@@ -73,7 +102,7 @@ async function signIn() {
 }
 
 async function signOut() {
-  const warning = dirty ? '\n\nUnpublished changes will be lost.' : '';
+  const warning = dirty ? '\n\nUnsaved changes will be lost.' : '';
   if (!confirm(`Log out? This signs out every device, not only this one.${warning}`)) return;
   try {
     await api('/api/logout', { method: 'POST' });
@@ -101,7 +130,7 @@ async function start() {
   } catch {
     role = 'viewer';
   }
-  applyRole();
+  el('role').hidden = role === 'admin';
   for (const screen of screens(schema)) states[screen.id] = fromContentJson(schema, screen.id, content);
   el('login').hidden = true;
   el('app').hidden = false;
@@ -111,19 +140,35 @@ async function start() {
   refreshStatus();
 }
 
+/* ---------- navigation ---------- */
+
+function screenName(id) {
+  if (id === MEDIA) return 'Media';
+  if (id === HISTORY) return 'History';
+  return screens(schema).find((screen) => screen.id === id)?.label ?? '';
+}
+
 function renderNav() {
   const nav = el('screens');
   nav.replaceChildren();
-  const entries = [...screens(schema).map((screen) => ({ id: screen.id, label: screen.label })),
-    { id: MEDIA, label: 'Media' }, { id: HISTORY, label: 'History' }];
-  for (const entry of entries) {
-    const button = document.createElement('button');
-    button.textContent = entry.label;
-    button.classList.toggle('active', entry.id === screenId);
-    button.onclick = () => { screenId = entry.id; renderNav(); renderScreen(); };
-    nav.append(button);
+  for (const group of NAV_GROUPS) {
+    const heading = document.createElement('p');
+    heading.className = 'nav-group';
+    heading.textContent = group.title;
+    nav.append(heading);
+    for (const id of group.ids) {
+      const button = document.createElement('button');
+      button.className = 'nav-item';
+      button.textContent = screenName(id);
+      button.classList.toggle('active', id === screenId);
+      if (id === screenId) button.setAttribute('aria-current', 'page');
+      button.onclick = () => { screenId = id; selected = new Set(); renderNav(); renderScreen(); };
+      nav.append(button);
+    }
   }
 }
+
+/* ---------- field helpers ---------- */
 
 function previewUrl(value) {
   if (!value) return null;
@@ -149,6 +194,18 @@ function hint(text) {
   return paragraph;
 }
 
+function heading(tag, text, className = '') {
+  const node = document.createElement(tag);
+  node.textContent = text;
+  if (className) node.className = className;
+  return node;
+}
+
+function nextFieldId() {
+  fieldCounter += 1;
+  return `field-${fieldCounter}`;
+}
+
 function galleryControl(value, change) {
   const keys = String(value ?? '').split('|').map((key) => key.trim()).filter(Boolean);
   const box = document.createElement('div');
@@ -158,10 +215,11 @@ function galleryControl(value, change) {
 
   function draw() {
     box.replaceChildren();
-    const list = document.createElement('div');
+    const list = document.createElement('ol');
     list.className = 'thumbs';
+    list.setAttribute('aria-label', 'Gallery pictures in order');
     keys.forEach((key, index) => {
-      const card = document.createElement('figure');
+      const card = document.createElement('li');
       card.className = 'thumb';
       const image = document.createElement('img');
       image.alt = '';
@@ -169,15 +227,15 @@ function galleryControl(value, change) {
       const actions = document.createElement('div');
       actions.className = 'thumb-actions';
       actions.append(
-        actionButton('â—€', 'Move picture left', index === 0, () => {
+        actionButton('Earlier', 'Move this picture earlier', index === 0, () => {
           [keys[index - 1], keys[index]] = [keys[index], keys[index - 1]];
           save();
         }),
-        actionButton('â–¶', 'Move picture right', index === keys.length - 1, () => {
+        actionButton('Later', 'Move this picture later', index === keys.length - 1, () => {
           [keys[index], keys[index + 1]] = [keys[index + 1], keys[index]];
           save();
         }),
-        actionButton('Remove', 'Remove this picture', false, () => {
+        actionButton('Remove', 'Remove this picture from the gallery', false, () => {
           keys.splice(index, 1);
           save();
         }, true),
@@ -202,13 +260,13 @@ function galleryControl(value, change) {
           keys.push(result.key);
           added += 1;
         } catch (error) {
-          setStatus(error.message, true);
+          toast(error.message, true);
           break;
         }
       }
       if (added) {
         save();
-        setStatus(`${added} picture${added === 1 ? '' : 's'} added. Press Publish to put them on the website.`);
+        toast(`${added} picture${added === 1 ? '' : 's'} added to the gallery.`);
       }
     };
     const addLabel = document.createElement('label');
@@ -226,21 +284,27 @@ function makeField(field, value, onChange, itemId) {
   const change = (next) => { onChange(next); markDirty(); };
   const wrapper = document.createElement('div');
   wrapper.className = 'field';
+  const id = nextFieldId();
 
   if (field.type === 'checkbox') {
     const label = document.createElement('label');
-    label.className = 'check';
+    label.className = 'switch';
     const input = document.createElement('input');
     input.type = 'checkbox';
+    input.id = id;
     input.checked = Boolean(value);
     input.onchange = () => change(input.checked);
-    label.append(input, document.createTextNode(` ${field.label}`));
+    const text = document.createElement('span');
+    text.textContent = field.label;
+    label.append(input, text);
     wrapper.append(label);
+    if (field.help) wrapper.append(hint(field.help));
     return wrapper;
   }
 
   const label = document.createElement('label');
   label.textContent = field.label;
+  label.htmlFor = id;
   wrapper.append(label);
 
   if (field.type === 'image') {
@@ -248,7 +312,9 @@ function makeField(field, value, onChange, itemId) {
     const image = node.querySelector('img');
     const source = previewUrl(value);
     if (source) { image.src = source; image.hidden = false; }
+    image.alt = '';
     const picker = node.querySelector('input');
+    picker.id = id;
     picker.onchange = async () => {
       if (!picker.files?.[0]) return;
       const form = new FormData();
@@ -257,9 +323,9 @@ function makeField(field, value, onChange, itemId) {
         const result = await api('/api/image', { method: 'POST', body: form });
         change(result.key);
         if (result.url) { image.src = result.url; image.hidden = false; }
-        setStatus('Picture ready. Click Publish to make it live.');
+        toast('Picture uploaded. Save, then publish to put it on the website.');
       } catch (error) {
-        setStatus(error.message, true);
+        toast(error.message, true);
       }
     };
     wrapper.append(node);
@@ -273,6 +339,7 @@ function makeField(field, value, onChange, itemId) {
 
   if (field.type === 'select') {
     const select = document.createElement('select');
+    select.id = id;
     const options = optionsFor(states, field, itemId);
     for (const option of options) select.append(new Option(option.label, option.value));
     if (value && !options.some((option) => option.value === String(value))) {
@@ -281,18 +348,17 @@ function makeField(field, value, onChange, itemId) {
     select.value = String(value ?? '');
     select.onchange = () => change(select.value);
     wrapper.append(select);
-    return wrapper;
-  }
-
-  if (field.type === 'link') {
+  } else if (field.type === 'link') {
     const input = document.createElement('input');
     input.type = 'text';
+    input.id = id;
     input.value = value ?? '';
-    input.placeholder = 'Type an address, or pick below';
+    input.placeholder = 'Type an address, or pick one below';
     input.oninput = () => change(input.value);
 
     const picker = document.createElement('select');
-    picker.append(new Option('Choose a page, category or product...', ''));
+    picker.setAttribute('aria-label', `Pick a page for ${field.label}`);
+    picker.append(new Option('Pick a page, category or product...', ''));
     const groups = new Map();
     for (const link of linkOptions(states)) {
       if (!groups.has(link.group)) {
@@ -310,98 +376,153 @@ function makeField(field, value, onChange, itemId) {
       picker.value = '';
     };
     wrapper.append(input, picker);
+  } else {
+    if (field.help) wrapper.append(hint(field.help));
+    const input = document.createElement(field.type === 'textarea' ? 'textarea' : 'input');
+    input.id = id;
+    if (input.tagName === 'INPUT') input.type = ['color', 'email', 'tel'].includes(field.type) ? field.type : 'text';
+    input.value = value ?? '';
+    input.oninput = () => change(input.value);
+    wrapper.append(input);
     return wrapper;
   }
-
   if (field.help) wrapper.append(hint(field.help));
-  const input = document.createElement(field.type === 'textarea' ? 'textarea' : 'input');
-  if (input.tagName === 'INPUT') input.type = ['color', 'email', 'tel'].includes(field.type) ? field.type : 'text';
-  input.value = value ?? '';
-  input.oninput = () => change(input.value);
-  wrapper.append(input);
   return wrapper;
 }
 
-function helpPanel(screen) {
-  const box = document.createElement('section');
-  box.className = 'help';
-  const title = document.createElement('h2');
-  title.textContent = 'How this works';
-  const explanation = document.createElement('p');
-  explanation.textContent = screen.help ?? '';
-  const impact = document.createElement('p');
-  const strong = document.createElement('strong');
-  strong.textContent = 'What it changes: ';
-  impact.append(strong, document.createTextNode(screen.impact ?? ''));
-  box.append(title, explanation, impact);
-  return box;
-}
-
-function moveItem(id, index, step) {
-  const items = states[id].items;
-  const target = index + step;
-  if (target < 0 || target >= items.length) return;
-  [items[index], items[target]] = [items[target], items[index]];
-  markDirty();
-  renderScreen();
-}
-
-function removeItem(screen, index) {
-  const item = states[screen.id].items[index];
-  const problems = blockersFor(states, screen.id, item);
-  if (problems.length) {
-    setStatus(problems.join(' '), true);
-    return;
+/** Groups fields under plain headings, in the order the schema lists them. */
+function groupedFields(screen, values, onChange, itemId) {
+  const groups = new Map();
+  for (const field of screen.fields) {
+    const name = field.group ?? 'Details';
+    if (!groups.has(name)) groups.set(name, []);
+    groups.get(name).push(makeField(field, values[field.key], (value) => onChange(field.key, value), itemId));
   }
-  const name = item[screen.titleFrom] || `this ${screen.itemLabel}`;
-  if (!confirm(`Delete "${name}"? It leaves the website after you press Publish.`)) return;
-  states[screen.id].items.splice(index, 1);
-  markDirty();
-  renderScreen();
-}
-
-function itemActions(screen, index) {
-  const bar = document.createElement('div');
-  bar.className = 'item-actions';
-  const count = states[screen.id].items.length;
-  if (screen.sortable) {
-    bar.append(
-      actionButton('Move up', 'Show this earlier', index === 0, () => moveItem(screen.id, index, -1)),
-      actionButton('Move down', 'Show this later', index === count - 1, () => moveItem(screen.id, index, 1)),
-    );
+  const wrapper = document.createDocumentFragment();
+  for (const [name, nodes] of groups) {
+    const section = document.createElement('section');
+    section.className = 'group';
+    section.append(heading('h3', name));
+    section.append(...nodes);
+    wrapper.append(section);
   }
-  bar.append(actionButton('Delete', `Delete this ${screen.itemLabel}`, false, () => removeItem(screen, index), true));
-  return bar;
+  return wrapper;
 }
 
-/** Applies one change to every selected item, after the editor shows what will change. */
-function bulkApply(screen, description, change) {
-  const chosen = states[screen.id].items.filter((item) => selected.has(String(item.id)));
-  if (!chosen.length) return;
-  const names = chosen.slice(0, 5).map((item) => item[screen.titleFrom] || 'Untitled');
-  const more = chosen.length > 5 ? ` and ${chosen.length - 5} more` : '';
-  const plural = chosen.length === 1 ? '' : 's';
-  const message = `${description} for ${chosen.length} ${screen.itemLabel}${plural}?\n\n${names.join(', ')}${more}\n\nNothing changes on the website until you press Publish.`;
-  if (!confirm(message)) return;
-  chosen.forEach(change);
-  selected = new Set();
-  markDirty();
-  renderScreen();
+/* ---------- live preview ---------- */
+
+function categoryName(id) {
+  return states.categories?.items.find((item) => String(item.id) === String(id))?.name ?? '';
+}
+
+function previewCard(screen, item) {
+  const card = document.createElement('aside');
+  card.className = 'preview-card';
+  card.setAttribute('aria-label', 'Preview of this item');
+  card.append(heading('p', 'Preview', 'preview-label'));
+
+  if (screen.id === 'products') {
+    const picture = previewUrl(item.picture);
+    const frame = document.createElement('div');
+    frame.className = 'preview-picture';
+    if (picture) {
+      const image = document.createElement('img');
+      image.alt = '';
+      image.src = picture;
+      frame.append(image);
+    } else {
+      frame.textContent = 'No main picture yet';
+    }
+    card.append(frame, heading('h4', item.name || 'Untitled'));
+    const price = Number(item.sale_price) > 0 ? item.sale_price : item.price;
+    const line = document.createElement('p');
+    line.className = 'preview-meta';
+    line.textContent = [categoryName(item.category), price ? `Price ${price}` : ''].filter(Boolean).join(' · ');
+    card.append(line);
+  } else if (screen.id === 'pages') {
+    card.append(heading('h4', item.title || 'Untitled'));
+    const text = document.createElement('p');
+    text.className = 'preview-body';
+    const body = String(item.text ?? '');
+    text.textContent = body.length > 220 ? `${body.slice(0, 220)}…` : body || 'No text yet.';
+    card.append(text);
+  } else if (screen.id === 'categories') {
+    const picture = previewUrl(item.picture);
+    if (picture) {
+      const frame = document.createElement('div');
+      frame.className = 'preview-picture';
+      const image = document.createElement('img');
+      image.alt = '';
+      image.src = picture;
+      frame.append(image);
+      card.append(frame);
+    }
+    card.append(heading('h4', item.name || 'Untitled'));
+    card.append(Object.assign(document.createElement('p'), { className: 'preview-body', textContent: item.description || 'No description yet.' }));
+  } else if (screen.id === 'navigation') {
+    const pill = document.createElement('span');
+    pill.className = 'preview-pill';
+    pill.textContent = item.label || 'Link text';
+    const where = document.createElement('p');
+    where.className = 'preview-meta';
+    where.textContent = `${item.location === 'footer' ? 'Shown in the footer' : 'Shown in the top menu'}${item.visible ? '' : ' (hidden)'}`;
+    card.append(pill, where);
+  } else {
+    return null;
+  }
+
+  if (item.visible === false) {
+    const note = document.createElement('p');
+    note.className = 'preview-note';
+    note.textContent = 'Hidden from the website.';
+    card.append(note);
+  }
+  return card;
+}
+
+/* ---------- collection screens (list and editor) ---------- */
+
+function rowSummary(screen, item) {
+  switch (screen.id) {
+    case 'products': {
+      const price = Number(item.sale_price) > 0 ? item.sale_price : item.price;
+      return [categoryName(item.category) || 'No category', price ? `Price ${price}` : ''].filter(Boolean).join(' · ');
+    }
+    case 'pages': return item.slug ? `/${item.slug}/` : '/';
+    case 'categories': return item.parent ? `Inside ${categoryName(item.parent)}` : 'Top level';
+    case 'navigation': return `${item.location === 'footer' ? 'Footer' : 'Top menu'} · ${item.link || 'No link yet'}`;
+    case 'redirects': return `${item.source || '?'} goes to ${item.destination || '?'}`;
+    default: return '';
+  }
+}
+
+function rowThumb(screen, item) {
+  if (!['products', 'categories', 'pages'].includes(screen.id)) return null;
+  const source = previewUrl(item.picture);
+  const thumb = document.createElement('span');
+  thumb.className = 'row-thumb';
+  if (source) {
+    const image = document.createElement('img');
+    image.alt = '';
+    image.src = source;
+    thumb.append(image);
+  }
+  return thumb;
 }
 
 function bulkBar(screen) {
   const bar = document.createElement('div');
   bar.className = 'bulk-bar';
   const count = selected.size;
-
   const label = document.createElement('span');
   label.className = 'bulk-count';
-  label.textContent = count ? `${count} selected` : 'Tick items below to change several at once.';
+  label.textContent = count ? `${count} selected` : 'Tick items to change several at once.';
 
   const actions = document.createElement('div');
   actions.className = 'bulk-actions';
   const categoryPicker = document.createElement('select');
   categoryPicker.disabled = !count;
+  categoryPicker.setAttribute('aria-label', 'Move selected items to a category');
   categoryPicker.append(new Option('Move to category...', ''));
   for (const option of optionsFor(states, { optionsFrom: 'categories', labelKey: 'name' }, '')) {
     if (option.value) categoryPicker.append(new Option(option.label, option.value));
@@ -412,7 +533,6 @@ function bulkBar(screen) {
     const name = categoryPicker.selectedOptions[0].text;
     bulkApply(screen, `Move to the category "${name}"`, (item) => { item.category = value; });
   };
-
   actions.append(
     categoryPicker,
     actionButton('Show', 'Show the selected items on the website', !count,
@@ -421,12 +541,6 @@ function bulkBar(screen) {
       () => bulkApply(screen, 'Hide from the website', (item) => { item.visible = false; })),
     actionButton('Feature', 'Mark the selected items as featured', !count,
       () => bulkApply(screen, 'Mark as featured', (item) => { item.featured = true; })),
-    actionButton('Unfeature', 'Remove the featured mark', !count,
-      () => bulkApply(screen, 'Remove the featured mark', (item) => { item.featured = false; })),
-    actionButton('Select all', 'Select every item on this screen', false, () => {
-      selected = new Set(states[screen.id].items.map((item) => String(item.id)));
-      renderScreen();
-    }),
     actionButton('Clear', 'Clear the selection', !count, () => {
       selected = new Set();
       renderScreen();
@@ -436,164 +550,265 @@ function bulkBar(screen) {
   return bar;
 }
 
-function selectRow(item) {
-  const label = document.createElement('label');
-  label.className = 'check select-row';
-  const input = document.createElement('input');
-  input.type = 'checkbox';
-  input.checked = selected.has(String(item.id));
-  input.onchange = () => {
-    if (input.checked) selected.add(String(item.id));
-    else selected.delete(String(item.id));
-    renderScreen();
-  };
-  label.append(input, document.createTextNode(' Select for bulk change'));
-  return label;
+/** Applies one change to every selected item, after confirming what will change. */
+function bulkApply(screen, description, change) {
+  const chosen = states[screen.id].items.filter((item) => selected.has(String(item.id)));
+  if (!chosen.length) return;
+  const names = chosen.slice(0, 5).map((item) => item[screen.titleFrom] || 'Untitled');
+  const more = chosen.length > 5 ? ` and ${chosen.length - 5} more` : '';
+  const plural = chosen.length === 1 ? '' : 's';
+  const message = `${description} for ${chosen.length} ${screen.itemLabel}${plural}?\n\n${names.join(', ')}${more}\n\nNothing changes on the website until you publish.`;
+  if (!confirm(message)) return;
+  chosen.forEach(change);
+  selected = new Set();
+  markDirty();
+  toast(`Changed ${chosen.length} ${screen.itemLabel}${plural}. Save, then publish.`);
+  renderScreen();
 }
 
-function renderScreen() {
-  const editor = el('editor');
-  editor.replaceChildren();
-  editor.inert = role !== 'admin';
+function listPane(screen, items, openItem) {
+  const pane = document.createElement('section');
+  pane.className = 'list-pane';
+  pane.setAttribute('aria-label', `${screen.label} list`);
 
-  if (screenId === HISTORY) {
-    renderHistory(editor);
-    return;
-  }
-  if (screenId === MEDIA) {
-    renderMedia(editor);
-    return;
-  }
+  if (screen.bulk && selected.size) pane.append(bulkBar(screen));
 
-  const screen = screens(schema).find((item) => item.id === screenId);
-  if (selectedFor !== screen.id) {
-    selected = new Set();
-    selectedFor = screen.id;
+  const tools = document.createElement('div');
+  tools.className = 'list-tools';
+  const search = document.createElement('input');
+  search.type = 'search';
+  search.placeholder = `Search ${screen.label.toLowerCase()}`;
+  search.setAttribute('aria-label', `Search ${screen.label.toLowerCase()}`);
+  search.value = listQuery;
+  const filter = document.createElement('select');
+  filter.setAttribute('aria-label', 'Show');
+  for (const [value, text] of [['all', 'All'], ['shown', 'Shown on the website'], ['hidden', 'Hidden']]) {
+    filter.append(new Option(text, value));
   }
-  editor.append(helpPanel(screen));
+  filter.value = listFilter;
+  tools.append(search, filter);
+  pane.append(tools);
 
-  if (screen.layout === 'key-value') {
-    const panel = document.createElement('section');
-    panel.className = 'panel';
-    panel.append(Object.assign(document.createElement('h2'), { textContent: screen.label }));
-    for (const field of screen.fields) {
-      panel.append(makeField(field, states[screen.id].values[field.key], (value) => {
-        states[screen.id].values[field.key] = value;
-      }));
+  const list = document.createElement('ul');
+  list.className = 'item-list';
+  pane.append(list);
+
+  const draw = () => {
+    list.replaceChildren();
+    const query = listQuery.trim().toLowerCase();
+    const shown = items.filter((item) => {
+      const text = `${item[screen.titleFrom] ?? ''} ${rowSummary(screen, item)}`.toLowerCase();
+      if (query && !text.includes(query)) return false;
+      if (listFilter === 'shown') return item.visible !== false;
+      if (listFilter === 'hidden') return item.visible === false;
+      return true;
+    });
+    if (!shown.length) {
+      const empty = document.createElement('li');
+      empty.className = 'empty-row';
+      empty.textContent = items.length ? 'Nothing matches your search.' : `No ${screen.label.toLowerCase()} yet.`;
+      list.append(empty);
     }
-    editor.append(panel);
-    return;
-  }
-
-  if (screen.bulk) editor.append(bulkBar(screen));
-
-  states[screen.id].items.forEach((item, index) => {
-    const panel = document.createElement('section');
-    panel.className = 'panel';
-    const name = item[screen.titleFrom] || 'Untitled';
-    panel.append(Object.assign(document.createElement('h2'), {
-      textContent: `${index + 1}. ${name}`,
-    }));
-    if (screen.bulk) panel.append(selectRow(item));
-    for (const field of screen.fields) {
-      panel.append(makeField(field, item[field.key], (value) => { item[field.key] = value; }, item.id));
+    for (const item of shown) {
+      const row = document.createElement('li');
+      row.className = 'item-row';
+      const isOpen = openItem && String(openItem.id) === String(item.id);
+      row.classList.toggle('open', isOpen);
+      if (screen.bulk) {
+        const check = document.createElement('input');
+        check.type = 'checkbox';
+        check.className = 'row-check';
+        check.checked = selected.has(String(item.id));
+        check.setAttribute('aria-label', `Select ${item[screen.titleFrom] || 'Untitled'}`);
+        check.onchange = () => {
+          if (check.checked) selected.add(String(item.id));
+          else selected.delete(String(item.id));
+          renderScreen();
+        };
+        row.append(check);
+      }
+      const open = document.createElement('button');
+      open.type = 'button';
+      open.className = 'row-open';
+      if (isOpen) open.setAttribute('aria-current', 'true');
+      const thumb = rowThumb(screen, item);
+      if (thumb) open.append(thumb);
+      const text = document.createElement('span');
+      text.className = 'row-text';
+      const name = document.createElement('span');
+      name.className = 'row-name';
+      name.textContent = item[screen.titleFrom] || 'Untitled';
+      const meta = document.createElement('span');
+      meta.className = 'row-meta';
+      meta.textContent = rowSummary(screen, item);
+      text.append(name, meta);
+      open.append(text);
+      if (screen.visibleField !== false && item.visible !== undefined) {
+        const pill = document.createElement('span');
+        pill.className = `pill ${item.visible ? 'pill-on' : 'pill-off'}`;
+        pill.textContent = item.visible ? 'Shown' : 'Hidden';
+        open.append(pill);
+      }
+      open.onclick = () => {
+        openIds[screen.id] = String(item.id);
+        renderScreen();
+      };
+      row.append(open);
+      list.append(row);
     }
-    panel.append(itemActions(screen, index));
-    editor.append(panel);
-  });
+  };
+
+  search.oninput = () => { listQuery = search.value; draw(); };
+  filter.onchange = () => { listFilter = filter.value; draw(); };
+  draw();
 
   const add = document.createElement('button');
+  add.type = 'button';
   add.className = 'add';
   add.textContent = `Add a ${screen.itemLabel}`;
-  add.onclick = () => {
-    const state = states[screen.id];
-    const item = makeBlankItem(schema, screen.id);
-    item.id = nextId(schema, screen.id, state, content);
-    for (const field of screen.fields) {
-      if (field.optionsFrom && field.emptyLabel === undefined && !item[field.key]) {
-        const first = optionsFor(states, field, item.id).find((option) => option.value);
-        if (first) item[field.key] = first.value;
-      }
+  add.onclick = () => addItem(screen);
+  pane.append(add);
+  return pane;
+}
+
+function addItem(screen) {
+  const state = states[screen.id];
+  const item = makeBlankItem(schema, screen.id);
+  item.id = nextId(schema, screen.id, state, content);
+  for (const field of screen.fields) {
+    if (field.optionsFrom && field.emptyLabel === undefined && !item[field.key]) {
+      const first = optionsFor(states, field, item.id).find((option) => option.value);
+      if (first) item[field.key] = first.value;
     }
-    state.items.push(item);
-    markDirty();
-    renderScreen();
-  };
-  editor.append(add);
+  }
+  state.items.push(item);
+  openIds[screen.id] = String(item.id);
+  markDirty();
+  renderScreen();
+  el('editor').querySelector('input[type="text"]')?.focus();
 }
 
-function formatTime(iso) {
-  return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+function duplicateItem(screen, item) {
+  const state = states[screen.id];
+  const copy = { ...item, id: nextId(schema, screen.id, state, content), __row: undefined };
+  copy[screen.titleFrom] = `${item[screen.titleFrom] || 'Untitled'} (copy)`;
+  copy.slug = '';
+  copy.visible = false;
+  state.items.push(copy);
+  openIds[screen.id] = String(copy.id);
+  markDirty();
+  toast('Copy created and hidden from the website. Change it, then show it when ready.');
+  renderScreen();
 }
 
-async function renderHistory(editor) {
-  const versions = document.createElement('section');
-  versions.className = 'panel';
-  versions.append(Object.assign(document.createElement('h2'), { textContent: 'Saved versions' }));
-  versions.append(hint('Each save keeps the version it replaces. Restoring puts that version back, and the version you restore over is kept too.'));
-  const versionList = document.createElement('div');
-  versionList.className = 'history-list';
-  versionList.textContent = 'Loadingâ€¦';
-  versions.append(versionList);
+function moveItem(screen, index, step) {
+  const items = states[screen.id].items;
+  const target = index + step;
+  if (target < 0 || target >= items.length) return;
+  [items[index], items[target]] = [items[target], items[index]];
+  markDirty();
+  renderScreen();
+}
 
-  const activity = document.createElement('section');
-  activity.className = 'panel';
-  activity.append(Object.assign(document.createElement('h2'), { textContent: 'Recent activity' }));
-  const activityList = document.createElement('div');
-  activityList.className = 'history-list';
-  activityList.textContent = 'Loadingâ€¦';
-  activity.append(activityList);
-  editor.append(await schedulePanel(), versions, activity);
-
-  let history;
-  try {
-    history = await api('/api/history');
-  } catch (error) {
-    versionList.textContent = error.message;
-    activityList.textContent = '';
+function removeItem(screen, item) {
+  const problems = blockersFor(states, screen.id, item);
+  if (problems.length) {
+    toast(problems.join(' '), true);
     return;
   }
-
-  versionList.replaceChildren();
-  if (!history.versions.length) versionList.textContent = 'No earlier versions yet. The next save creates the first one.';
-  for (const version of history.versions) {
-    const row = document.createElement('div');
-    row.className = 'history-row';
-    const when = document.createElement('span');
-    when.textContent = `Saved ${formatTime(version.saved_at)}`;
-    row.append(when, actionButton('Restore', 'Put this version back', false, () => restoreVersion(version)));
-    versionList.append(row);
-  }
-
-  activityList.replaceChildren();
-  if (!history.audit.length) activityList.textContent = 'Nothing yet.';
-  for (const entry of history.audit.slice(0, 50)) {
-    const row = document.createElement('div');
-    row.className = 'history-row';
-    const tabs = entry.tabs?.length ? ` (${entry.tabs.join(', ')})` : '';
-    const who = ROLE_NAMES[entry.by] ?? entry.by;
-    row.textContent = `${formatTime(entry.at)}: ${entry.action}${tabs}, by ${who}`;
-    activityList.append(row);
-  }
+  const name = item[screen.titleFrom] || `this ${screen.itemLabel}`;
+  if (!confirm(`Delete "${name}"? It leaves the website after you publish.`)) return;
+  const items = states[screen.id].items;
+  const index = items.indexOf(item);
+  items.splice(index, 1);
+  openIds[screen.id] = items[0] ? String(items[0].id) : undefined;
+  markDirty();
+  toast(`Deleted "${name}". Save, then publish to remove it from the website.`);
+  renderScreen();
 }
 
-async function restoreVersion(version) {
-  const warning = dirty ? '\n\nYour unpublished changes will be lost.' : '';
-  if (!confirm(`Put the website back to the version saved ${formatTime(version.saved_at)}?${warning}`)) return;
-  try {
-    await api('/api/restore', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ id: version.id }),
-    });
-    setStatus('Version restored. Press Publish to put it on the website.');
-    await start();
-  } catch (error) {
-    setStatus(error.message, true);
+function detailPane(screen, items, item) {
+  const pane = document.createElement('section');
+  pane.className = 'detail-pane';
+  if (!item) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.append(heading('h2', `No ${screen.label.toLowerCase()} yet`));
+    empty.append(hint(`Add a ${screen.itemLabel} to start. Changes appear on the website after you publish.`));
+    const add = document.createElement('button');
+    add.type = 'button';
+    add.className = 'primary';
+    add.textContent = `Add a ${screen.itemLabel}`;
+    add.onclick = () => addItem(screen);
+    empty.append(add);
+    pane.append(empty);
+    return pane;
   }
+
+  const index = items.indexOf(item);
+  const bar = document.createElement('div');
+  bar.className = 'detail-bar';
+  bar.append(heading('h2', item[screen.titleFrom] || 'Untitled'));
+  const actions = document.createElement('div');
+  actions.className = 'detail-actions';
+  if (screen.sortable) {
+    actions.append(
+      actionButton('Move up', 'Show this earlier in the list', index === 0, () => moveItem(screen, index, -1)),
+      actionButton('Move down', 'Show this later in the list', index === items.length - 1, () => moveItem(screen, index, 1)),
+    );
+  }
+  if (screen.duplicable) {
+    actions.append(actionButton('Duplicate', 'Make a hidden copy of this item', false, () => duplicateItem(screen, item)));
+  }
+  actions.append(actionButton('Delete', `Delete this ${screen.itemLabel}`, false, () => removeItem(screen, item), true));
+  bar.append(actions);
+  pane.append(bar);
+
+  const body = document.createElement('div');
+  body.className = 'detail-body';
+  const form = document.createElement('div');
+  form.className = 'detail-form';
+  let preview = previewCard(screen, item);
+  // Re-draw the preview and the list name as the editor types, so the effect of each change is visible at once.
+  const refresh = (key, value) => {
+    item[key] = value;
+    const next = previewCard(screen, item);
+    if (preview && next) preview.replaceWith(next);
+    else if (next) body.append(next);
+    preview = next ?? preview;
+    const openName = document.querySelector('.item-row.open .row-name');
+    if (openName) openName.textContent = item[screen.titleFrom] || 'Untitled';
+  };
+  form.append(groupedFields(screen, item, refresh, item.id));
+  body.append(form);
+  if (preview) body.append(preview);
+  pane.append(body);
+  return pane;
 }
 
-/** Every place a picture is used, keyed by the picture's stored key. */
+function renderCollection(editor, screen) {
+  const items = states[screen.id].items;
+  const openId = openIds[screen.id];
+  const item = items.find((entry) => String(entry.id) === String(openId)) ?? items[0];
+  if (item) openIds[screen.id] = String(item.id);
+  const workspace = document.createElement('div');
+  workspace.className = 'workspace';
+  workspace.append(listPane(screen, items, item), detailPane(screen, items, item));
+  editor.append(workspace);
+}
+
+/* ---------- settings ---------- */
+
+function renderSettings(editor, screen) {
+  const panel = document.createElement('section');
+  panel.className = 'settings-form';
+  const values = states[screen.id].values;
+  panel.append(groupedFields(screen, values, (key, value) => { values[key] = value; }));
+  editor.append(panel);
+}
+
+/* ---------- media library ---------- */
+
 function usageByKey() {
   const usage = new Map();
   const use = (value, where) => {
@@ -613,13 +828,10 @@ function usageByKey() {
 }
 
 async function renderMedia(editor) {
-  const panel = document.createElement('section');
-  panel.className = 'panel';
-  panel.append(Object.assign(document.createElement('h2'), { textContent: 'Media library' }));
-  panel.append(hint('Every picture uploaded here is kept, with its alt text. Alt text describes a picture for people who cannot see it. The list also shows where each picture is used.'));
-
-  const toolbar = document.createElement('div');
-  toolbar.className = 'media-toolbar';
+  const page = document.createElement('section');
+  page.className = 'media-page';
+  const bar = document.createElement('div');
+  bar.className = 'toolbar';
   const picker = document.createElement('input');
   picker.type = 'file';
   picker.multiple = true;
@@ -632,30 +844,29 @@ async function renderMedia(editor) {
       try {
         await api('/api/image', { method: 'POST', body: form });
       } catch (error) {
-        setStatus(error.message, true);
+        toast(error.message, true);
         break;
       }
     }
-    setStatus('Pictures uploaded to the library.');
+    toast('Pictures added to the library.');
     renderScreen();
   };
   const upload = document.createElement('label');
-  upload.className = 'file-button';
+  upload.className = 'file-button primary-look';
   upload.textContent = 'Upload pictures';
   upload.append(picker);
-
   const missingFilter = document.createElement('label');
-  missingFilter.className = 'check';
+  missingFilter.className = 'switch';
   const missingBox = document.createElement('input');
   missingBox.type = 'checkbox';
-  missingFilter.append(missingBox, document.createTextNode(' Show only pictures missing alt text'));
-  toolbar.append(upload, missingFilter);
-  panel.append(toolbar);
+  missingFilter.append(missingBox, document.createTextNode('Show only pictures missing alt text'));
+  bar.append(upload, missingFilter);
+  page.append(bar, hint('Alt text describes a picture for people who cannot see it. Add it to every picture you upload.'));
 
   const grid = document.createElement('div');
   grid.className = 'media-grid';
-  panel.append(grid);
-  editor.append(panel);
+  page.append(grid);
+  editor.append(page);
 
   let library;
   try {
@@ -667,7 +878,6 @@ async function renderMedia(editor) {
 
   const usage = usageByKey();
   const inLibrary = new Set(library.map((item) => item.key));
-  // Pictures used before the library existed are listed too, but their alt text cannot be saved yet.
   const older = [...usage.keys()].filter((key) => !inLibrary.has(key))
     .map((key) => ({ key, name: key.split('/').pop(), alt: '', older: true }));
   const entries = [...library, ...older];
@@ -676,7 +886,7 @@ async function renderMedia(editor) {
     grid.replaceChildren();
     const shown = entries.filter((entry) => !missingBox.checked || !String(entry.alt ?? '').trim());
     if (!shown.length) {
-      grid.textContent = missingBox.checked ? 'Every picture has alt text.' : 'No pictures yet.';
+      grid.append(hint(missingBox.checked ? 'Every picture has alt text.' : 'No pictures yet. Upload one to start the library.'));
       return;
     }
     for (const entry of shown) {
@@ -691,12 +901,14 @@ async function renderMedia(editor) {
       const where = document.createElement('p');
       where.className = 'hint';
       const uses = usage.get(entry.key) ?? [];
-      where.textContent = uses.length ? `Used in: ${uses.join('; ')}` : 'Not used on any page yet.';
-
+      where.textContent = uses.length ? `Used in ${uses.join('; ')}` : 'Not used anywhere yet.';
+      const altId = nextFieldId();
       const altLabel = document.createElement('label');
       altLabel.textContent = 'Alt text';
+      altLabel.htmlFor = altId;
       const alt = document.createElement('input');
       alt.type = 'text';
+      alt.id = altId;
       alt.maxLength = 300;
       alt.value = entry.alt ?? '';
       alt.placeholder = 'Describe the picture';
@@ -709,14 +921,13 @@ async function renderMedia(editor) {
             body: JSON.stringify({ key: entry.key, alt: alt.value }),
           });
           entry.alt = alt.value.trim();
-          setStatus('Alt text saved.');
+          toast('Alt text saved.');
         } catch (error) {
-          setStatus(error.message, true);
+          toast(error.message, true);
         }
       });
-      const olderNote = entry.older ? hint('Uploaded before the library existed. Upload it again to add alt text.') : null;
       card.append(image, name, where, altLabel, alt, save);
-      if (olderNote) card.append(olderNote);
+      if (entry.older) card.append(hint('Uploaded before the library existed. Upload it again to add alt text.'));
       grid.append(card);
     }
   };
@@ -724,17 +935,23 @@ async function renderMedia(editor) {
   draw();
 }
 
+/* ---------- history and schedule ---------- */
+
+function formatTime(iso) {
+  return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+}
+
 async function schedulePanel() {
   const box = document.createElement('section');
-  box.className = 'panel';
-  box.append(Object.assign(document.createElement('h2'), { textContent: 'Scheduled publish' }));
+  box.className = 'card-panel';
+  box.append(heading('h2', 'Scheduled publish'));
   box.append(hint('The website is published at the time you choose, using the last saved version. Changes you have not saved are not included.'));
 
   let scheduled = null;
   try {
     scheduled = (await api('/api/schedule')).publish_at;
   } catch {
-    // Without the schedule, show the form. Saving will report any problem.
+    // Without the schedule, show the form. Saving reports any problem.
   }
 
   const row = document.createElement('div');
@@ -742,27 +959,28 @@ async function schedulePanel() {
   if (scheduled) {
     const text = document.createElement('span');
     text.textContent = `Scheduled for ${formatTime(scheduled)}.`;
-    row.append(text, actionButton('Cancel', 'Cancel the scheduled publish', false, async () => {
+    row.append(text, actionButton('Cancel schedule', 'Cancel the scheduled publish', false, async () => {
       try {
         await api('/api/schedule', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ publish_at: null }),
         });
-        setStatus('Scheduled publish cancelled.');
+        toast('Scheduled publish cancelled.');
         renderScreen();
       } catch (error) {
-        setStatus(error.message, true);
+        toast(error.message, true);
       }
     }, true));
   } else {
     const input = document.createElement('input');
     input.type = 'datetime-local';
+    input.setAttribute('aria-label', 'Publish date and time');
     const local = new Date(Date.now() - new Date().getTimezoneOffset() * 60000);
     input.min = local.toISOString().slice(0, 16);
     row.append(input, actionButton('Schedule publish', 'Publish at this time', false, async () => {
       if (!input.value) {
-        setStatus('Choose a date and time first.', true);
+        toast('Choose a date and time first.', true);
         return;
       }
       try {
@@ -772,16 +990,118 @@ async function schedulePanel() {
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ publish_at: publishAt }),
         });
-        setStatus(`Publish scheduled for ${formatTime(publishAt)}.`);
+        toast(`Publish scheduled for ${formatTime(publishAt)}.`);
         renderScreen();
       } catch (error) {
-        setStatus(error.message, true);
+        toast(error.message, true);
       }
     }));
   }
   box.append(row);
   return box;
 }
+
+async function renderHistory(editor) {
+  const versions = document.createElement('section');
+  versions.className = 'card-panel';
+  versions.append(heading('h2', 'Saved versions'));
+  versions.append(hint('Each save keeps the version it replaces. Restoring puts that version back, and the version you restore over is kept too.'));
+  const versionList = document.createElement('div');
+  versionList.className = 'history-list';
+  versionList.textContent = 'Loading…';
+  versions.append(versionList);
+
+  const activity = document.createElement('section');
+  activity.className = 'card-panel';
+  activity.append(heading('h2', 'Recent activity'));
+  const activityList = document.createElement('div');
+  activityList.className = 'history-list';
+  activityList.textContent = 'Loading…';
+  activity.append(activityList);
+
+  editor.append(await schedulePanel(), versions, activity);
+
+  let history;
+  try {
+    history = await api('/api/history');
+  } catch (error) {
+    versionList.textContent = error.message;
+    activityList.textContent = '';
+    return;
+  }
+
+  versionList.replaceChildren();
+  if (!history.versions.length) versionList.append(hint('No earlier versions yet. The next save creates the first one.'));
+  for (const version of history.versions) {
+    const row = document.createElement('div');
+    row.className = 'history-row';
+    const when = document.createElement('span');
+    when.textContent = `Saved ${formatTime(version.saved_at)}`;
+    row.append(when, actionButton('Restore', 'Put this version back', false, () => restoreVersion(version)));
+    versionList.append(row);
+  }
+
+  activityList.replaceChildren();
+  if (!history.audit.length) activityList.append(hint('Nothing yet.'));
+  for (const entry of history.audit.slice(0, 50)) {
+    const row = document.createElement('div');
+    row.className = 'history-row';
+    const tabs = entry.tabs?.length ? ` (${entry.tabs.join(', ')})` : '';
+    const who = ROLE_NAMES[entry.by] ?? entry.by;
+    row.textContent = `${formatTime(entry.at)}: ${entry.action}${tabs}, by ${who}`;
+    activityList.append(row);
+  }
+}
+
+async function restoreVersion(version) {
+  const warning = dirty ? '\n\nYour unsaved changes will be lost.' : '';
+  if (!confirm(`Put the website back to the version saved ${formatTime(version.saved_at)}?${warning}`)) return;
+  try {
+    await api('/api/restore', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ id: version.id }),
+    });
+    toast('Version restored. Publish to put it on the website.');
+    await start();
+  } catch (error) {
+    toast(error.message, true);
+  }
+}
+
+/* ---------- screen router ---------- */
+
+function renderScreen() {
+  const editor = el('editor');
+  editor.replaceChildren();
+  editor.inert = role !== 'admin';
+  el('screen-title').textContent = screenName(screenId);
+  updateButtons();
+
+  if (screenId === HISTORY) {
+    renderHistory(editor);
+    return;
+  }
+  if (screenId === MEDIA) {
+    renderMedia(editor);
+    return;
+  }
+
+  const screen = screens(schema).find((item) => item.id === screenId);
+  if (selectedFor !== screen.id) {
+    selected = new Set();
+    selectedFor = screen.id;
+    listQuery = '';
+    listFilter = 'all';
+  }
+  if (screen.layout === 'key-value') {
+    renderSettings(editor, screen);
+  } else {
+    renderCollection(editor, screen);
+  }
+}
+
+/* ---------- saving and publishing ---------- */
 
 async function refreshStatus() {
   try {
@@ -792,8 +1112,6 @@ async function refreshStatus() {
   }
 }
 
-const BUSY = ['publishing', 'previewing'];
-
 function watchPublish() {
   const timer = setInterval(async () => {
     try {
@@ -802,6 +1120,7 @@ function watchPublish() {
         clearInterval(timer);
         const link = status.status === 'preview-ready' ? ` Open ${PREVIEW_URL}` : '';
         setStatus(`${status.message}${link}`);
+        toast(status.message);
       }
     } catch {
       clearInterval(timer);
@@ -809,11 +1128,13 @@ function watchPublish() {
   }, 3000);
 }
 
-/** Saves every screen to the store. Publishing and previews both build from this saved copy. */
+/** Checks the form, then saves every screen to the store. Publishing and previews build from this copy. */
 async function saveDraft() {
   normalizeSlugs(schema, states);
   const problems = slugProblems(schema, states);
-  if (problems.length) throw new Error(problems[0] + (problems.length > 1 ? ` (${problems.length - 1} more to fix)` : ''));
+  if (problems.length) {
+    throw new Error(problems[0] + (problems.length > 1 ? ` (${problems.length - 1} more to fix)` : ''));
+  }
 
   // Changed web addresses need redirects. The Redirects screen is merged first so its unsaved rows are kept.
   const changes = redirectsForSlugChanges(schema, states, content);
@@ -825,7 +1146,7 @@ async function saveDraft() {
   for (const screen of screens(schema)) {
     content = toContentJson(schema, screen.id, states[screen.id], content);
   }
-  setStatus('Savingâ€¦');
+  setStatus('Saving…');
   const saved = await request('/api/content', {
     method: 'PUT',
     headers: { 'content-type': 'application/json', 'x-expected-version': contentVersion },
@@ -833,29 +1154,41 @@ async function saveDraft() {
   });
   contentVersion = saved.headers.get('x-content-version') ?? contentVersion;
   dirty = false;
+  setStatus('All changes saved.');
+  updateButtons();
+}
+
+async function saveChanges() {
+  try {
+    await saveDraft();
+    toast('Changes saved. Publish when you are ready to put them on the website.');
+    renderScreen();
+  } catch (error) {
+    toast(error.message, true);
+  }
 }
 
 async function publish() {
   try {
     await saveDraft();
-    setStatus('Sending to the websiteâ€¦');
     await api('/api/publish', { method: 'POST' });
-    setStatus('Publishingâ€¦');
+    toast('Publishing started. This takes a few minutes.');
+    setStatus('Publishing…');
     watchPublish();
   } catch (error) {
-    setStatus(error.message, true);
+    toast(error.message, true);
   }
 }
 
 async function preview() {
   try {
     await saveDraft();
-    setStatus('Building a previewâ€¦');
     await api('/api/preview', { method: 'POST' });
-    setStatus(`Building a preview. It will open at ${PREVIEW_URL} when ready.`);
+    toast('Building a preview. It will open at the preview address when ready.');
+    setStatus(`Building a preview at ${PREVIEW_URL}`);
     watchPublish();
   } catch (error) {
-    setStatus(error.message, true);
+    toast(error.message, true);
   }
 }
 
@@ -871,10 +1204,17 @@ function downloadBackup(event) {
 
 el('sign-in').onclick = signIn;
 el('password').onkeydown = (event) => { if (event.key === 'Enter') signIn(); };
+el('save').onclick = saveChanges;
 el('publish').onclick = publish;
 el('preview').onclick = preview;
 el('logout').onclick = signOut;
 el('backup').onclick = downloadBackup;
+document.addEventListener('keydown', (event) => {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's' && role === 'admin' && !el('app').hidden) {
+    event.preventDefault();
+    if (dirty) saveChanges();
+  }
+});
 window.addEventListener('beforeunload', (event) => {
   if (dirty) event.preventDefault();
 });
