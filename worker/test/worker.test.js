@@ -165,3 +165,24 @@ test('publish requires a valid session and calls workflow_dispatch', async () =>
     globalThis.fetch = originalFetch;
   }
 });
+
+test('publish failure reports GitHub status and message', async () => {
+  const env = makeEnv();
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ message: 'Workflow not found' }), {
+    status: 404,
+    headers: { 'content-type': 'application/json' },
+  });
+  try {
+    const cookie = await login(env);
+    const response = await handle(new Request('https://worker.test/api/publish', {
+      method: 'POST', headers: { cookie, origin: env.ADMIN_ORIGIN },
+    }), env);
+    assert.equal(response.status, 502);
+    const body = await response.json();
+    assert.match(body.error, /404/);
+    assert.match(body.error, /Workflow not found/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

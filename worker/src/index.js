@@ -111,7 +111,10 @@ export async function handle(request, env, now = Date.now()) {
         body: JSON.stringify({ ref: 'main', inputs: { note: 'Publish from admin' } }),
       },
     );
-    if (!upstream.ok) return response({ error: 'Could not start publishing.' }, 502, env);
+    if (!upstream.ok) {
+      const detail = (await upstream.text()).slice(0, 300);
+      return response({ error: `GitHub rejected publish (${upstream.status}): ${detail}` }, 502, env);
+    }
     await putStatus(env, { status: 'publishing', message: 'Publishing…' });
     return response({ status: 'publishing' }, 202, env);
   }
