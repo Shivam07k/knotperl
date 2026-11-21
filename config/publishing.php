@@ -20,4 +20,5 @@ return [
     ],
     'keep_backups' => (int) env('PUBLISH_KEEP_BACKUPS', 5),
     'site_url' => env('LIVE_SITE_URL'),
+    'admin_url' => env('ADMIN_SITE_URL', 'https://knots-and-perl-admin.pages.dev'),
 ];

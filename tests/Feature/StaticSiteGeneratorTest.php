@@ -18,6 +18,7 @@ class StaticSiteGeneratorTest extends TestCase
     {
         config()->set('cloudflare.r2.public_url', 'https://images.knotsandperl.com');
         config()->set('publishing.site_url', 'https://knotsandperl.pages.dev');
+        config()->set('publishing.admin_url', 'https://admin.example.test');
         $target = $this->tempPath('site');
 
         $schema = new SpreadsheetSchemaService();
@@ -46,6 +47,9 @@ class StaticSiteGeneratorTest extends TestCase
         $this->assertStringContainsString('data-sound="false"', $html);
         $this->assertStringContainsString('class="brand-mark"', $html);
         $this->assertStringContainsString('class="product-card"', $html);
+        $this->assertStringContainsString('class="admin-float"', $html);
+        $this->assertStringContainsString('https://admin.example.test', $html);
+        $this->assertStringContainsString('admin-float', (string) file_get_contents($target.'/css/site.css'));
         $this->assertStringNotContainsString('id="intro-code"', $html);
         $this->assertStringContainsString('images.knotsandperl.com', $html);
         $this->assertStringContainsString('/products/pearl-knot-pendant/', $html);

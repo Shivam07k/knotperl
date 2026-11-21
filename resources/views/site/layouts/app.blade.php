@@ -51,6 +51,7 @@
 
     @include('site.partials.footer')
 
+    <a class="admin-float" href="{{ config('publishing.admin_url') }}" aria-label="Admin panel">Admin</a>
     @php($whatsapp = preg_replace('/\D/', '', (string) ($site['settings']['whatsapp_number'] ?? '')))
     @if($whatsapp !== '')
         <a class="whatsapp-float" href="https://wa.me/{{ $whatsapp }}" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp"><span class="tooltip">Chat on WhatsApp</span><span aria-hidden="true">WA</span></a>
